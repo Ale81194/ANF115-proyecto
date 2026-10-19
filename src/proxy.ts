@@ -1,0 +1,17 @@
+import type { NextRequest } from "next/server";
+import { actualizarSesion } from "@/supabase/proxy";
+
+/**
+ * Punto de entrada de Proxy en Next.js 16 (antes middleware).
+ *
+ * No sustituye la autorizacion de los casos de uso: solo mantiene la sesion.
+ */
+export async function proxy(request: NextRequest) {
+  return actualizarSesion(request);
+}
+
+export const config = {
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|branding|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+  ],
+};

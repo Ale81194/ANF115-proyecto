@@ -1,0 +1,29 @@
+import Link from "next/link";
+import { ArrowLeft, Compass } from "lucide-react";
+import { Button } from "@/components/atoms/button";
+
+export default function NoEncontrado() {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-fondo px-4">
+      <div className="w-full max-w-md rounded-card border border-borde bg-superficie p-8 text-center shadow-card">
+        <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-superficie-tenue text-primario">
+          <Compass aria-hidden="true" className="size-5" />
+        </span>
+        <p className="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-texto-suave">
+          Error 404
+        </p>
+        <h1 className="mt-1 text-2xl text-texto">Ruta no encontrada</h1>
+        <p className="mt-2 text-sm leading-relaxed text-texto-suave">
+          La direccion solicitada no existe en el cascaron o el recurso no esta
+          disponible para tu contexto.
+        </p>
+        <Button asChild className="mt-6">
+          <Link href="/dashboard">
+            <ArrowLeft aria-hidden="true" />
+            Volver al dashboard
+          </Link>
+        </Button>
+      </div>
+    </main>
+  );
+}
