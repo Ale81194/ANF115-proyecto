@@ -82,6 +82,7 @@ export default function DashboardPage() {
         descripcion="Contexto de la empresa, origen de datos y estado de la implementacion. Las cifras aparecen cuando existan asientos contabilizados."
         contexto={
           <>
+            <Badge variant="warning">En construccion</Badge>
             <Badge variant="outline">Fase 01 &middot; base</Badge>
             <SourceBadge />
             <Badge variant="neutral">Corte: sin seleccionar</Badge>

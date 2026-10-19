@@ -29,6 +29,7 @@ export function ModulePlaceholder({
         descripcion={pantalla.descripcion}
         contexto={
           <>
+            <Badge variant="warning">En construccion</Badge>
             <Badge variant="outline">Fase {pantalla.fase}</Badge>
             <Badge variant="neutral">{pantalla.acceso}</Badge>
             {pantalla.notaFase ? (
@@ -42,7 +43,7 @@ export function ModulePlaceholder({
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
         <EmptyState
           icono={Clock}
-          titulo="Pantalla pendiente de implementacion"
+          titulo="Pantalla en construccion"
           descripcion={`La ruta ${pantalla.ruta} ya existe y forma parte del cascaron. Su contenido funcional se construye en la fase ${pantalla.fase}, con contrato, permisos, datos y pruebas propias.`}
         />
 

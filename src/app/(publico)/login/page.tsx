@@ -22,8 +22,8 @@ export default function LoginPage() {
           role="status"
           className="rounded-input border border-advertencia/30 bg-advertencia/10 px-4 py-3 text-xs leading-relaxed text-advertencia"
         >
-          <span className="font-semibold">Cascaron:</span> este formulario es
-          visual y no autentica todavia. No ingreses credenciales reales.
+          <span className="font-semibold">En construccion:</span> este formulario
+          es visual y no autentica todavia. No ingreses credenciales reales.
         </div>
 
         <FormField
