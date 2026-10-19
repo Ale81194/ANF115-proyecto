@@ -98,7 +98,7 @@ function ContenidoSidebar({
 
       <nav
         aria-label="Navegacion principal"
-        className="flex-1 space-y-5 overflow-y-auto px-3 py-5"
+        className="scrollbar-menu flex-1 space-y-5 overflow-y-auto px-3 py-5"
       >
         <ItemEnlace
           item={navegacionPrincipal}

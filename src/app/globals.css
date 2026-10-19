@@ -90,4 +90,35 @@
   .skip-link:focus {
     top: 1rem;
   }
+
+  /* Scroll fino para el menu lateral sobre fondo cafe. */
+  .scrollbar-menu {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(213, 166, 108, 0.35) transparent;
+    scrollbar-gutter: stable;
+  }
+
+  .scrollbar-menu::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-menu::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-menu::-webkit-scrollbar-thumb {
+    background-color: rgba(213, 166, 108, 0.35);
+    border-radius: 999px;
+  }
+
+  .scrollbar-menu:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(213, 166, 108, 0.55);
+  }
+
+  .scrollbar-menu::-webkit-scrollbar-button,
+  .scrollbar-menu::-webkit-scrollbar-corner {
+    display: none;
+    background: transparent;
+  }
 }
