@@ -2,7 +2,7 @@
 
 **Proyecto:** Carlitos Finanzas  
 **Versión documental:** 0.1 · **Fecha:** 19 de octubre de 2026  
-**Estado:** estructura propuesta para implementación; el código del árbol aún no está creado.
+**Estado:** estructura implementada para la Fase 01 (acceso, catálogo, períodos, auditoría). Las carpetas de fases posteriores se completan al implementar sus casos de uso.
 
 ## 1. Objetivo
 

@@ -96,6 +96,8 @@ Como el llamador carece de DML, las funciones de escritura no pueden depender de
 
 En el directorio de autorización, el rol interno necesita lecturas suficientes para evaluar permisos sin recursión. En tablas financieras, RLS continúa limitándolo a la empresa del actor. Las funciones de gestión de membresía comprobarán `usuarios.gestionar` antes de cambiar cualquier fila; el usuario no puede editar por sí mismo su rol mediante DML.
 
+Cuando una función definer es propiedad de `finanzas_rpc`, la identidad se obtiene con `private.actor_actual()`, un helper propiedad del rol de migración que devuelve únicamente `auth.uid()`. El rol interno no recibe `USAGE` sobre el esquema `auth` ni acceso a sus tablas. Esta separación evita conceder al rol de escritura un privilegio más amplio del necesario y conserva la comprobación de identidad dentro de la misma transacción.
+
 PostgreSQL ejecuta una función definer con privilegios de su propietario; RLS puede ser omitida por propietarios de tabla y roles con `BYPASSRLS`. Por eso la separación de propietarios es una parte necesaria de esta propuesta. [T5, T6] Los grants y las revocaciones de cada función deben quedar aplicados en la misma migración de creación.
 
 Las operaciones concretas y sus argumentos están en [10](10_CONTRATOS_Y_CASOS_DE_USO.md). No se expone una función genérica para actualizar cualquier tabla, ejecutar SQL recibido o asignar estados arbitrarios.

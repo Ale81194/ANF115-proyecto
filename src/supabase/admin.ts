@@ -2,6 +2,7 @@ import "server-only";
 
 import { createClient } from "@supabase/supabase-js";
 import { obtenerEnvServidor } from "@/config/env.server";
+import type { Database } from "@/supabase/database.types";
 
 /**
  * Cliente administrativo reservado a gestion autorizada de Auth y scripts
@@ -16,7 +17,7 @@ export function crearClienteAdmin() {
     );
   }
 
-  return createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_ADMIN_KEY, {
+  return createClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_ADMIN_KEY, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,

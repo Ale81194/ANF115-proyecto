@@ -2,7 +2,7 @@
 
 **Proyecto:** Carlitos Finanzas  
 **Versión documental:** 0.1 · **Fecha:** 19 de octubre de 2026  
-**Estado:** contratos funcionales y técnicos propuestos; código y pruebas pendientes.
+**Estado:** contratos funcionales y técnicos propuestos. CU-01, CU-03, CU-04 y CU-23 tienen implementación y evidencia inicial; CU-02, CU-05 a CU-22 siguen pendientes.
 
 ## 1. Alcance de los contratos
 

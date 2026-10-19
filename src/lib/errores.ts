@@ -80,3 +80,7 @@ export class ErrorDominio extends Error {
 export function estadoHttpPara(codigo: CodigoError): number {
   return ESTADO_HTTP[codigo];
 }
+
+export function esCodigoError(valor: string): valor is CodigoError {
+  return Object.prototype.hasOwnProperty.call(ESTADO_HTTP, valor);
+}

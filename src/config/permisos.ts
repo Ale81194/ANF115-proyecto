@@ -76,3 +76,7 @@ export function rolTienePermiso(rol: Rol, permiso: Permiso): boolean {
 export function esPermisoConocido(valor: string): valor is Permiso {
   return (Object.values(PERMISOS) as string[]).includes(valor);
 }
+
+export function esRol(valor: string): valor is Rol {
+  return (Object.values(ROLES) as string[]).includes(valor);
+}

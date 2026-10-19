@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "test:unit": "vitest run",
     "test:watch": "vitest",
-    "verificar:entorno": "tsx scripts/verificar-entorno-local.ts"
+    "verificar:entorno": "tsx scripts/verificar-entorno-local.ts",
+    "preparar:demo": "tsx scripts/crear-usuarios-demo.ts"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "1.3.1",

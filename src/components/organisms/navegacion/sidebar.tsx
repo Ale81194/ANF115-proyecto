@@ -124,7 +124,7 @@ function ContenidoSidebar({
       </nav>
 
       <div className="space-y-1 border-t border-white/10 px-5 py-4 text-[11px] text-crema-100/50">
-        <p>Fase 0 &middot; Cascaron</p>
+        <p>Fase 01 &middot; Base y acceso</p>
         <p>Datos simulados &middot; uso academico</p>
       </div>
     </div>

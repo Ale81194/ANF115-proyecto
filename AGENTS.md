@@ -10,13 +10,14 @@ fase correspondiente en `docs/`.
 Panaderia Carlitos. Trabaja con datos simulados, moneda USD y resultados que
 deben poder explicarse y reproducirse.
 
-Estado: **cascaron (Fase 0)**. Existen la estructura, las reglas, la navegacion,
-los tokens de marca y las pantallas placeholder. **No existe todavia**:
+Estado: **Fase 01 parcial (19/10/2026)**. Existen la estructura, las reglas, la
+navegacion, los tokens de marca, el acceso con Supabase, las membresias, el
+catalogo de cuentas, los periodos y la auditoria. **No existe todavia**:
 
-- autenticacion real ni membresias;
-- migraciones, tablas, RLS, RPC ni semillas;
-- casos de uso, controladores, repositorios o motor financiero;
-- carga de Excel, graficos, exportacion PDF/XLSX ni pruebas automatizadas.
+- administracion de usuarios y membresias desde la interfaz (CU-02);
+- diario, importacion, aprobacion y reversion de asientos;
+- estados financieros, indicadores, presupuestos, escenarios, proyecciones y reportes;
+- carga de Excel, graficos, exportacion PDF/XLSX y pruebas E2E de todo el recorrido.
 
 No presentar una pantalla placeholder como funcionalidad terminada.
 
@@ -213,41 +214,44 @@ npm run typecheck      # TypeScript sin emitir
 npm run test:unit      # Vitest: logica pura
 npm run test:watch     # Vitest en modo interactivo
 npm run verificar:entorno  # Node, Docker, Supabase CLI y variables
+npm run preparar:demo  # usuarios demo locales idempotentes
 npx supabase init      # ya ejecutado; no repetir
 npx supabase start     # requiere Docker (Fase 01)
+npx supabase migration up --local
 npx supabase db reset --local
 npx supabase gen types typescript --local > src/supabase/database.types.ts
 ```
 
-`db reset --local` destruye datos locales: usarlo solo sobre una base
-descartable.
+`db reset --local` destruye datos locales y usuarios de Auth: usarlo solo sobre
+una base descartable y volver a ejecutar `npm run preparar:demo`.
 
 ## 13. Estructura actual
 
 ```text
-src/app/                 rutas y pantallas placeholder
+src/app/                 rutas y pantallas; catalogo, periodos y auditoria reales
 src/components/          atoms, molecules, organisms, templates
 src/config/              rutas, navegacion, pantallas, permisos, entorno
+src/auth/                identidad, contexto y verificacion de permisos
+src/controladores/       CU-01, CU-03, CU-04 y CU-23 implementados
+src/repositorios/        acceso a Supabase y RPC
+src/servicios/           reglas puras de catalogo y calendario
+src/schemas/             validacion Zod
 src/lib/                 decimal, dinero, errores, utilidades
 src/styles/              tokens.css (paleta y radios de marca)
 src/types/               contratos compartidos
-src/supabase/            clientes SSR, proxy y admin
+src/supabase/            clientes SSR, proxy, admin y tipos generados
 src/proxy.ts             entrada de sesion Next 16
-src/auth/                (vacio; Fase 01)
-src/controladores/       (vacio; por caso de uso)
-src/servicios/           (vacio; reglas de calculo)
-src/repositorios/        (vacio; acceso a datos)
-src/schemas/             (vacio; Zod)
-supabase/                config, migraciones y seed
+supabase/migrations/     esquema, RLS, RPC y grants de Fase 01
+supabase/seed.sql        empresa, roles, permisos, catalogo y periodos
+scripts/                 verificacion de entorno y usuarios demo
 tests/                   unit, integration, e2e, fixtures
 docs/                    fuente de verdad funcional y tecnica
 .github/workflows/       CI: lint, typecheck, unit tests y build
 ```
 
-Las carpetas de capa se conservan como marcadores (`.gitkeep`) para que la
-estructura sea visible. No se crean archivos de implementacion vacios ni
-pantallas que aparenten funcionalidad: cada archivo real se agrega al
-implementar su primer caso de uso.
+Las carpetas de capa conservan marcadores (`.gitkeep`) solo donde aun no existe
+implementacion. No se crean archivos vacios ni pantallas que aparenten
+funcionalidad: cada archivo real se agrega al implementar su primer caso de uso.
 
 ## 14. Prohibiciones explicitas
 

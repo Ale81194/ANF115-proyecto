@@ -1,7 +1,7 @@
 # Fase 01 · Base del proyecto y acceso
 
 **Proyecto:** Carlitos Finanzas. **Versión documental:** 0.1. **Fecha:** 19 de octubre de 2026.  
-**Estado:** especificación de ejecución desarrollada; implementación y pruebas de aplicación pendientes.
+**Estado:** implementación parcial al 19/10/2026: acceso, membresía, catálogo, períodos y auditoría funcionan contra Supabase local. La administración de usuarios y el cierre de período siguen pendientes.
 
 ## 1. Objetivo y resultado observable
 

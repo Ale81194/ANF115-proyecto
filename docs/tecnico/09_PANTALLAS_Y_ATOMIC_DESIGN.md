@@ -2,7 +2,7 @@
 
 **Proyecto:** Carlitos Finanzas  
 **Versión documental:** 0.1 · **Fecha:** 19 de octubre de 2026  
-**Estado:** especificación de interfaz y navegación; pantallas pendientes de construcción y prueba.
+**Estado:** especificación de interfaz y navegación; dashboard, acceso, catálogo, períodos y auditoría implementados en la Fase 01. Las pantallas de diario, estados, presupuestos, escenarios, proyecciones y reportes siguen pendientes.
 
 ## 1. Criterio de diseño
 

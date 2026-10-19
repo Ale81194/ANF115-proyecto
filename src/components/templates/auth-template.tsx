@@ -103,8 +103,8 @@ export function AuthTemplate({
           <div className="mt-8">{children}</div>
 
           <p className="mt-8 border-t border-borde pt-4 text-[11px] leading-relaxed text-texto-suave">
-            Sistema academico con datos simulados. La autenticacion real, las
-            membresias y los permisos se incorporan en la Fase 01.
+            Sistema academico con datos simulados. El acceso local, las
+            membresias y los permisos se resuelven en el servidor con Supabase.
           </p>
         </div>
       </section>

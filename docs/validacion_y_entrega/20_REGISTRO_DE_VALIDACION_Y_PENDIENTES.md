@@ -140,7 +140,28 @@ Al ejecutar una PR se abrirá una evidencia EV-A con ID único. El registro cont
 
 Para un defecto se anotará impacto, causa conocida o hipótesis, casos afectados, responsable, estado y criterio de cierre. Si el fallo revela una regla mal especificada, la corrección cambia la regla con justificación y revisa sus expectativas; no altera resultados esperados sin dejar rastro.
 
-**Ejecuciones de aplicación registradas al corte: ninguna.** El número de pruebas aprobadas de la aplicación es cero; esto describe la etapa actual de planificación, no un resultado fallido del sistema.
+**Ejecuciones de aplicación registradas al corte anterior:** ninguna. El número de pruebas aprobadas de la aplicación era cero; describía la etapa de planificación, no un resultado fallido del sistema.
+
+### 7.1 Evidencia de la Fase 01 parcial (19/10/2026)
+
+Se ejecutó el módulo de acceso, catálogo, períodos y auditoría contra Supabase local. Los datos de prueba se eliminaron al terminar; la base quedó con la semilla reproducible.
+
+| ID | Objeto ejecutado | Resultado observado | Estado |
+| --- | --- | --- | --- |
+| EV-A01 | `npm run verificar:entorno`; `npx supabase start`; cuatro migraciones y `seed.sql`; `db reset --local` posterior | Node 22, Docker y Supabase CLI disponibles; migraciones aplicadas desde cero; 2 empresas, 3 roles, 15 permisos, 10 rubros, 42 cuentas de Carlitos y 36 períodos | Aprobada |
+| EV-A02 | `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run build` | Sin errores; 47 pruebas unitarias en 10 archivos; build de 41 rutas | Aprobada |
+| EV-A03 | Login de administrador, analista, gerencia y usuario de la empresa B; usuario autenticado sin membresía | Acceso resuelto por Supabase Auth y membresía; sin membresía se muestra “Acceso pendiente” y no se expone navegación financiera | Aprobada |
+| EV-A04 | Catálogo: listar 42 cuentas, crear, editar con motivo, rechazar duplicado y conservar código inmutable | Árbol por jerarquía, naturaleza y rubro; versión incrementada; auditoría registrada; duplicado rechazado | Aprobada |
+| EV-A05 | Períodos: listar 36, crear 2027-03, rechazar duplicado y sugerir el año siguiente | Rango mensual correcto, estado abierto, numeración inicial y versión; duplicado rechazado | Aprobada |
+| EV-A06 | RPC `guardar_cuenta`, `crear_periodo`, `mis_permisos`; DML directo; aislamiento A/B | Idempotencia y conflicto correctos; versión obsoleta rechazada; DML directo rechazado con `42501`; analista sin `catalogo.publicar`; empresa B no lee ni escribe datos de Carlitos | Aprobada |
+| EV-A07 | Recorrido Playwright en build de producción: login, dashboard, catálogo, períodos, alta, auditoría, permisos y aislamiento; prueba de humo posterior al reset | Todos los recorridos esperados; sin `pageerror` ni errores de consola; el reset reconstruyó el esquema y la semilla | Aprobada |
+| EV-A08 | Limpieza de cuentas, períodos, auditoría e idempotencia de prueba | La base volvió a 42 cuentas, 36 períodos, auditoría vacía y versión de empresa 1 | Aprobada |
+
+**Cobertura de PR:** PR-01, PR-02, PR-04, PR-06, PR-07 y PR-35 cuentan con evidencia parcial del módulo. PR-03 no se aprueba porque la administración de usuarios sigue sin pantalla. PR-05 no se aprueba porque el diario y sus claves foráneas compuestas pertenecen a la Fase 02. Las demás PR permanecen pendientes.
+
+**Decisión registrada:** las RPC de escritura son propiedad de `finanzas_rpc`; la identidad se obtiene con `private.actor_actual()` porque el rol interno no recibe `USAGE` sobre `auth`. La separación de propietarios y la revocación de DML se conservan. El detalle quedó actualizado en [08](../tecnico/08_AUTENTICACION_PERMISOS_Y_AUDITORIA.md).
+
+**Pendientes inmediatos:** administración de usuarios y membresías (CU-02), cierre y reapertura de períodos (CU-21/22), diario (Fase 02), estados (Fase 03) y pruebas de restauración (PD-08).
 
 ## 8. Documentos relacionados
 

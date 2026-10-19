@@ -1,16 +1,18 @@
 "use client";
 
 import { createBrowserClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { leerEnvPublico } from "@/config/env.public";
+import type { Database } from "@/supabase/database.types";
 
-let cliente: ReturnType<typeof createBrowserClient> | null = null;
+let cliente: SupabaseClient<Database> | null = null;
 
 /**
  * Cliente de navegador para Auth y operaciones permitidas por RLS.
  *
  * No se usa para DML financiero directo ni recibe credenciales administrativas.
  */
-export function obtenerClienteNavegador() {
+export function obtenerClienteNavegador(): SupabaseClient<Database> {
   if (cliente) {
     return cliente;
   }
@@ -23,6 +25,6 @@ export function obtenerClienteNavegador() {
     );
   }
 
-  cliente = createBrowserClient(env.supabaseUrl, env.supabaseKey);
+  cliente = createBrowserClient<Database>(env.supabaseUrl, env.supabaseKey);
   return cliente;
 }

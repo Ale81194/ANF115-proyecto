@@ -2,7 +2,8 @@
 
 **Proyecto:** Carlitos Finanzas  
 **Versión documental:** 0.1 · **Fecha:** 19 de octubre de 2026  
-**Estado:** especificación inicial desarrollada; implementación y pruebas de aplicación pendientes.  
+**Estado:** especificación inicial desarrollada; Fase 01 implementada parcialmente contra Supabase local. Las fases 02–05 y sus pruebas de aplicación siguen pendientes.
+
 **Responsable funcional:** equipo del proyecto. **Responsable técnico previsto:** responsable de arquitectura.
 
 ## 1. Decisión de arquitectura

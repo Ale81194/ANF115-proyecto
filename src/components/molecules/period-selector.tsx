@@ -40,7 +40,7 @@ export function PeriodSelector({
         aria-label="Periodo contable activo"
       >
         {sinPeriodos ? (
-          <option value="">Sin periodos cargados</option>
+          <option value="">Seleccion en Fase 02</option>
         ) : (
           <>
             <option value="">Seleccionar periodo</option>

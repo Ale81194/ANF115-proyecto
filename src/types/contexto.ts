@@ -1,3 +1,5 @@
+import type { Permiso, Rol } from "@/config/permisos";
+
 /**
  * Tipos compartidos de contratos.
  *
@@ -25,6 +27,35 @@ export type ContextoServidor = Readonly<{
   origenDatos: OrigenDatos;
   requestId: string;
 }>;
+
+/**
+ * Contexto de acceso que consume la interfaz.
+ *
+ * Incluye solo datos de presentacion del actor y su empresa. No contiene
+ * secretos ni sustituye la autorizacion de cada caso de uso.
+ */
+export type ContextoAcceso = Readonly<{
+  usuarioId: UUID;
+  usuarioNombre: string;
+  usuarioCorreo: string;
+  empresaId: UUID;
+  empresaNombre: string;
+  moneda: string;
+  origenDatos: OrigenDatos;
+  rolCodigo: Rol;
+  permisos: readonly Permiso[];
+  requestId: string;
+}>;
+
+export type EstadoAcceso =
+  | { estado: "sin_sesion" }
+  | {
+      estado: "sin_membresia";
+      usuarioId: UUID;
+      usuarioNombre: string;
+      usuarioCorreo: string;
+    }
+  | { estado: "ok"; contexto: ContextoAcceso };
 
 export type ConsultaFinanciera = {
   desde: FechaContable;

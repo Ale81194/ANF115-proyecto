@@ -353,7 +353,7 @@ export const pantallas = {
   auditoria: {
     titulo: "Auditoria",
     descripcion:
-      "Eventos filtrados por actor, entidad, accion y fecha.",
+      "Eventos recientes de la empresa con actor, accion, entidad, versiones y motivo.",
     ruta: "/auditoria",
     acceso: "auditoria.leer",
     permiso: "auditoria.leer",

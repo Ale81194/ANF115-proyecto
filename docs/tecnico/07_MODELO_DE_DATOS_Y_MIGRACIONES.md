@@ -2,7 +2,7 @@
 
 **Proyecto:** Carlitos Finanzas  
 **Versión documental:** 0.1 · **Fecha:** 19 de octubre de 2026  
-**Estado:** modelo lógico y restricciones propuestos; migraciones todavía pendientes de implementación.
+**Estado:** migraciones de la Fase 01 implementadas (identidad, acceso, catálogo, períodos y auditoría); migraciones de las fases 02–05 pendientes.
 
 ## 1. Principios del modelo
 

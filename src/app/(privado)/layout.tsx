@@ -1,22 +1,64 @@
 import type * as React from "react";
+import { redirect } from "next/navigation";
+import { connection } from "next/server";
+import { Button } from "@/components/atoms/button";
 import { AppShell } from "@/components/templates/app-shell";
+import { AuthTemplate } from "@/components/templates/auth-template";
+import { resolverAcceso } from "@/controladores/acceso.controller";
+import { cerrarSesionAction } from "./actions";
 
 /**
  * Layout del area privada.
  *
- * En la Fase 01 este layout resolvera el contexto de acceso y pasara los
- * permisos efectivos al menu. La autorizacion se repite en cada caso de uso.
- *
- * `instant = false`: las rutas privadas dependen de sesion, empresa y periodo;
- * se acepta una navegacion de bloqueo en lugar de pre-renderizar datos que
- * todavia no existen.
+ * Resuelve identidad y membresia antes de componer el AppShell. Cada pagina y
+ * cada caso de uso vuelven a comprobar el permiso de su operacion.
  */
 export const instant = false;
 
-export default function LayoutPrivado({
+export default async function LayoutPrivado({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <AppShell>{children}</AppShell>;
+  await connection();
+  const estado = await resolverAcceso();
+
+  if (estado.estado === "sin_sesion") {
+    redirect("/login");
+  }
+
+  if (estado.estado === "sin_membresia") {
+    return (
+      <AuthTemplate
+        titulo="Acceso pendiente"
+        descripcion="Tu identidad es valida, pero todavia no tiene una membresia activa en una empresa."
+      >
+        <div className="space-y-4">
+          <div className="rounded-input border border-advertencia/30 bg-advertencia/10 px-4 py-3 text-sm leading-relaxed text-advertencia">
+            <p className="font-semibold">{estado.usuarioNombre}</p>
+            <p className="text-xs">{estado.usuarioCorreo}</p>
+            <p className="mt-2 text-xs">
+              Pedile a un administrador que active tu membresia. Mientras tanto
+              no se muestra informacion financiera.
+            </p>
+          </div>
+          <form action={cerrarSesionAction}>
+            <Button type="submit" variant="secondary" className="w-full">
+              Cerrar sesion
+            </Button>
+          </form>
+        </div>
+      </AuthTemplate>
+    );
+  }
+
+  return (
+    <AppShell
+      contexto={estado.contexto}
+      permisos={estado.contexto.permisos}
+      cerrarSesion={cerrarSesionAction}
+    >
+      {children}
+    </AppShell>
+  );
 }
