@@ -148,7 +148,7 @@ Se ejecutó el módulo de acceso, catálogo, períodos y auditoría contra Supab
 
 | ID | Objeto ejecutado | Resultado observado | Estado |
 | --- | --- | --- | --- |
-| EV-A01 | `npm run verificar:entorno`; `npx supabase start`; cuatro migraciones y `seed.sql`; `db reset --local` posterior | Node 22, Docker y Supabase CLI disponibles; migraciones aplicadas desde cero; 2 empresas, 3 roles, 15 permisos, 10 rubros, 42 cuentas de Carlitos y 36 períodos | Aprobada |
+| EV-A01 | `npm run verificar:entorno`; `npx supabase start`; cuatro migraciones y `seed.sql`; `db reset --local` posterior; commit `efe9d6e` | Node 22, Docker y Supabase CLI disponibles; migraciones aplicadas desde cero; 2 empresas, 3 roles, 15 permisos, 10 rubros, 42 cuentas de Carlitos y 36 períodos | Aprobada |
 | EV-A02 | `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run build` | Sin errores; 47 pruebas unitarias en 10 archivos; build de 41 rutas | Aprobada |
 | EV-A03 | Login de administrador, analista, gerencia y usuario de la empresa B; usuario autenticado sin membresía | Acceso resuelto por Supabase Auth y membresía; sin membresía se muestra “Acceso pendiente” y no se expone navegación financiera | Aprobada |
 | EV-A04 | Catálogo: listar 42 cuentas, crear, editar con motivo, rechazar duplicado y conservar código inmutable | Árbol por jerarquía, naturaleza y rubro; versión incrementada; auditoría registrada; duplicado rechazado | Aprobada |
