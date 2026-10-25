@@ -9,10 +9,10 @@
   --crema-100: #faf3e9;
   --arena-200: #ebdccd;
   --dorado-400: #d5a66c;
-  --texto: #29211d;
-  --muted: #776a62;
+  --texto: #2c211d;
+  --muted: #6f6965;
   --verde: #28785a;
-  --rojo: #b4473d;
+  --rojo: #b64232;
   --azul: #356d95;
 
   /* Tokens semanticos */
@@ -32,10 +32,10 @@
   --advertencia: #a06a1f;
   --info: var(--azul);
 
-  --fuente-ui: Inter, "Segoe UI", Arial, sans-serif;
+  --fuente-ui: Arial, "Liberation Sans", sans-serif;
   --fuente-marca: Georgia, "Times New Roman", serif;
 
-  --radio-card: 16px;
+  --radio-card: 20px;
   --radio-input: 10px;
   --radio-pill: 999px;
 

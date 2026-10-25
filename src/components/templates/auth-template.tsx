@@ -9,9 +9,9 @@ type AuthTemplateProps = {
 };
 
 const BENEFICIOS = [
-  "Estados conciliados con procedencia verificable.",
-  "Presupuestos y escenarios versionados.",
-  "Permisos por rol y auditoria desde el primer cambio.",
+  "Ingresos y gastos organizados por categoría.",
+  "Indicadores y reportes verificables por período.",
+  "Acceso por rol y bitácora de cambios confirmados.",
 ] as const;
 
 /**
@@ -55,8 +55,8 @@ export function AuthTemplate({
             Decisiones con numeros que se pueden explicar.
           </h1>
           <p className="text-sm leading-relaxed text-crema-100/70">
-            Un solo lugar para el diario, los estados historicos, el
-            presupuesto y las proyecciones de la panaderia.
+            Un solo lugar para registrar cobros y pagos, consultar reportes
+            y comprender los resultados de la panadería.
           </p>
           <ul className="space-y-2.5 text-sm text-crema-100/80">
             {BENEFICIOS.map((beneficio) => (
@@ -104,7 +104,7 @@ export function AuthTemplate({
 
           <p className="mt-8 border-t border-borde pt-4 text-[11px] leading-relaxed text-texto-suave">
             Sistema academico con datos simulados. El acceso local, las
-            membresias y los permisos se resuelven en el servidor con Supabase.
+            perfiles y los permisos se resuelven en el servidor con Supabase.
           </p>
         </div>
       </section>
