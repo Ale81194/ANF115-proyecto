@@ -1,5 +1,68 @@
 # 20. Registro de validación y pendientes
 
+## Corte vigente: reconstrucción de siete módulos — 25/10/2026
+
+La evidencia de esta sección sustituye el estado inicial del 19/10 para la
+aplicación actual. Las secciones siguientes se conservan como antecedentes, sin
+reescribir sus resultados. Alcance: PDF ANF y los tres contextos nuevos, con
+Next.js y **Supabase local** por instrucción del usuario. No se modificó ningún
+proyecto remoto ni se ejecutó el SQL histórico del ZIP.
+
+| Evidencia | Ejecución real | Resultado |
+| --- | --- | --- |
+| EV-SM01 | Respaldo previo `pg_dump -Fc` y restauración completa con `pg_restore --exit-on-error` como `supabase_admin`, en `carlitos_restore_check_20261025` | Restauración correcta: cuatro perfiles, cuatro identidades Auth, 43 cuentas anteriores y 16 políticas anteriores. Base separada del mismo clúster; no equivale a restauración en otro equipo. |
+| EV-SM02 | Cuatro migraciones locales `20261025120000`, `121000`, `122000`, `123000` | Cinco tablas operativas, 26 categorías iniciales, 12 políticas RLS, vista invoker y contratos de reporte. Tablas anteriores conservadas en `archivo_anf_20261025`, sin acceso API. |
+| EV-SM03 | `npm run lint`, `npm run typecheck`, `npm run build` | Correctos. No se introdujeron dependencias de ejecución nuevas ni se actualizaron Next/React. |
+| EV-SM04 | `npm run test:unit` | 68 pruebas correctas en 11 archivos; incluye validación de importes/fechas, zona de fecha sugerida y navegación de siete módulos. Los cálculos reales se comprueban en PostgreSQL, no mediante una fórmula duplicada en React. |
+| EV-SM05 | `tests/integration/siete-modulos.sql` con `ON_ERROR_STOP=1` | 44 comprobaciones correctas: RLS, anónimo, propiedad, desactivación, último administrador, invariantes, idempotencia, concurrencia por revisión, filtros, reportes y bitácora inmutable. Todo se revierte con ROLLBACK. |
+| EV-SM06 | `npm run test:api` con sesiones Auth reales | Dos actualizaciones simultáneas sobre revisión 1: una confirma y otra devuelve `40001`. Administrador consulta el registro, otro propietario no puede leerlo/anularlo. Importes de API como texto. Datos E2E anulados al finalizar. |
+| EV-SM07 | `npm run test:e2e`, Chrome sin interfaz con Playwright | Login de ambos roles; alta, corrección y anulación de ingresos/gastos; alta/desactivación de usuario y categoría por administrador; consulta de reportes y bitácora; empleado rechazado en Usuarios. Menú móvil funciona y no hay desbordamiento a 390 px. Sin errores JavaScript capturados. |
+| EV-SM08 | `npm run test:recovery` con Mailpit local | Correo de recuperación real local, verificación de token, contraseña nueva, login con la nueva contraseña y rechazo de reutilización del enlace. La prueba restaura la contraseña demo desde mantenimiento local al finalizar. |
+| EV-SM09 | `npm audit` al instalar y `npm audit --omit=dev` | Cero vulnerabilidades reportadas en esa ejecución; no sustituye una revisión periódica. |
+
+Las pruebas E2E están identificadas como `E2E SIMULADO`. Sus movimientos quedan
+anulados y sus usuarios/categorías de prueba, inactivos; no se borran para ocultar
+el historial. Al cerrar los recorridos verificados no quedaron movimientos
+vigentes de prueba. El caso del informe ($12,000 de ingresos, $9,600 de gastos,
+$2,400 de resultado y 80 %) se probó transaccionalmente sin cargarlo como dato
+operativo de la panadería.
+
+Capturas regenerables, excluidas de Git: `test-results/panel-administrador-desktop.png`
+y `test-results/panel-empleado-mobile.png`. Se revisaron ambas visualmente.
+Respaldos protegidos fuera del repositorio:
+`%LOCALAPPDATA%/Temp/opencode/carlitos-before-seven-modules-20261025.dump` y
+`carlitos-seven-modules-20261025.dump` en la misma carpeta.
+
+Incidencias corregidas durante la verificación: sintaxis de una condición CASE
+en la migración; pertenencia del rol interno para asignar propietario; permisos
+del esquema Auth para ese rol (resueltos con helper privado del actor); manejo
+de entradas decimales inválidas antes de construir Decimal; selectores ambiguos
+del navegador y aviso de restitución de foco. Las dos primeras migraciones
+fallidas se revirtieron transaccionalmente; las correcciones posteriores se
+versionaron por separado después de aplicar la migración inicial.
+
+La CLI se fijó en 2.122.0 y el arranque mínimo usa PostgreSQL, Auth, REST/gateway y
+Mailpit. Se reinició solo Carlitos para aplicar plantilla de recuperación y
+longitud mínima de contraseña. No se reinició Docker ni otros proyectos. El
+arranque descargó imágenes nuevas; C: quedó con aproximadamente 2.4 GB libres.
+Se requiere administrar ese espacio antes de nuevas descargas importantes.
+
+### Límites y pendientes de entrega
+
+- PDF/XLSX no está habilitado: es complementario, no parte del núcleo obligatorio.
+- El Word original todavía menciona Vite y el estado remoto del 21/10. Debe
+  actualizarse antes de la entrega; no se sobrescribió el archivo del usuario.
+- Revisar extensión/formato APA, fuentes y videoexposición de 20 minutos con
+  participación de los tres integrantes. Las pruebas de software no validan
+  automáticamente esos entregables académicos.
+- La comprobación móvil y de teclado no constituye una auditoría WCAG completa.
+  No se ha certificado zoom de 200 %, todos los navegadores ni rendimiento bajo
+  carga de producción. No se promete una medición no ejecutada.
+- No se desplegó producción ni se configuró el conector remoto. La configuración
+  futura de correo y respaldos externos deberá verificarse en su propio entorno.
+
+---
+
 **Proyecto:** Carlitos Finanzas. **Versión documental:** 0.1. **Fecha de corte:** 19 de octubre de 2026.
 
 ## 1. Estado real del trabajo
