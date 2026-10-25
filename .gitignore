@@ -50,3 +50,6 @@ next-env.d.ts
 
 # local imports and temporary exports
 *.local
+
+# generated, machine-specific agent registry
+/.atl/
