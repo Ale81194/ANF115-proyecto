@@ -28,6 +28,7 @@ export const PERMISOS = {
 export type Permiso = (typeof PERMISOS)[keyof typeof PERMISOS];
 
 export const ROLES = {
+  empleado: "empleado",
   administrador: "administrador",
   analista: "analista",
   gerencia: "gerencia",
@@ -42,6 +43,7 @@ export type Rol = (typeof ROLES)[keyof typeof ROLES];
  * asignaciones excepcionales que deben existir en la base y quedar auditadas.
  */
 export const PERMISOS_POR_ROL: Readonly<Record<Rol, readonly Permiso[]>> = {
+  empleado: [PERMISOS.finanzasLeer],
   administrador: [
     PERMISOS.finanzasLeer,
     PERMISOS.usuariosGestionar,

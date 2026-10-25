@@ -62,3 +62,12 @@ export function formatearFechaCorta(valor: string): string {
   const [anio, mes, dia] = exigirFechaContable(valor).split("-");
   return `${dia}/${mes}/${anio}`;
 }
+
+/** Default for new entries only; never reinterprets an existing accounting date. */
+export function hoyEnElSalvador(instante = new Date()): string {
+  const partes = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/El_Salvador", year: "numeric", month: "2-digit", day: "2-digit",
+  }).formatToParts(instante);
+  const dato = (tipo: string) => partes.find((p) => p.type === tipo)?.value;
+  return `${dato("year")}-${dato("month")}-${dato("day")}`;
+}

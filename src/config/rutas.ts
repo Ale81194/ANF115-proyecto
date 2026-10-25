@@ -9,8 +9,15 @@
 export const rutas = {
   inicio: "/",
   login: "/login",
+  recuperarAcceso: "/recuperar-acceso",
+  restablecerAcceso: "/restablecer-acceso",
+  confirmarRecuperacion: "/auth/confirmar",
   dashboard: "/dashboard",
+  ingresos: "/ingresos",
+  gastos: "/gastos",
+  categorias: "/categorias",
   usuarios: {
+    propio: "/usuarios/perfil",
     lista: "/usuarios",
     nuevo: "/usuarios/nuevo",
     detalle: (id: string) => `/usuarios/${encodeURIComponent(id)}`,
@@ -76,3 +83,9 @@ export const rutas = {
 } as const;
 
 export type Rutas = typeof rutas;
+
+/** Historical screens retained in source, withdrawn from the operational app. */
+export const rutasRetiradas = [
+  "/catalogo", "/periodos", "/importaciones", "/diario", "/estados", "/presupuestos",
+  "/escenarios", "/proyecciones", "/analisis", "/configuracion",
+] as const;
