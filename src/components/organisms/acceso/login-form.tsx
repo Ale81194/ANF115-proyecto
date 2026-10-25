@@ -1,6 +1,8 @@
 "use client";
 
 import { LogIn } from "lucide-react";
+import Link from "next/link";
+import { rutas } from "@/config/rutas";
 import { useActionState, useState } from "react";
 import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
@@ -47,7 +49,7 @@ export function LoginForm({ accion }: LoginFormProps) {
       <FormField
         id="correo"
         etiqueta="Correo electronico"
-        ayuda="El correo asociado a tu membresia activa."
+        ayuda="El correo asociado a tu cuenta. El perfil debe estar activo."
         requerido
       >
         <Input
@@ -64,7 +66,7 @@ export function LoginForm({ accion }: LoginFormProps) {
       <FormField
         id="contrasena"
         etiqueta="Contrasena"
-        ayuda="Minimo 6 caracteres en el entorno local."
+        ayuda="Usa la contraseña asignada a tu cuenta."
         requerido
       >
         <Input
@@ -96,6 +98,7 @@ export function LoginForm({ accion }: LoginFormProps) {
         Acceso local con Supabase. Si no tenes credenciales demo, pedilas al
         responsable del entorno. No se muestran contrasenas en esta pantalla.
       </p>
+      <Link href={rutas.recuperarAcceso} className="inline-block text-sm text-primario underline">¿Olvidó su contraseña?</Link>
     </form>
   );
 }

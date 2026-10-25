@@ -12,6 +12,7 @@
     "test:unit": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "node tests/e2e/siete-modulos.mjs",
+    "test:recovery": "node tests/e2e/recuperacion.mjs",
     "test:api": "node tests/integration/finanzas-api.mjs",
     "verificar:entorno": "tsx scripts/verificar-entorno-local.ts",
     "preparar:demo": "tsx scripts/crear-usuarios-demo.ts",
