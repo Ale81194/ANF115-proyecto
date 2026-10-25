@@ -1,11 +1,14 @@
-import type { Metadata } from "next";
-import { ModulePlaceholder } from "@/components/molecules/module-placeholder";
-import { pantallas } from "@/config/pantallas";
+import { connection } from "next/server";
+import { consultarFinanzas } from "@/controladores/finanzas.controller";
+import { FinanceWorkspace } from "@/components/organisms/finance-workspace";
+import { OperationError } from "@/components/molecules/operation-error";
+import { guardarOperacion } from "../operaciones";
 
-export const metadata: Metadata = {
-  title: "Reportes",
-};
+export const metadata = { title: "Reportes" };
+export const instant = false;
 
-export default function Page() {
-  return <ModulePlaceholder pantalla={pantallas.reportes.lista} />;
+export default async function Page({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  await connection();
+  const r = await consultarFinanzas(await searchParams);
+  return r.ok ? <FinanceWorkspace data={r.datos} modulo="reportes" accion={guardarOperacion} /> : <OperationError mensaje={r.error.mensaje} />;
 }

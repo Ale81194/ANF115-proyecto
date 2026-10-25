@@ -11,7 +11,7 @@ export default function LoginPage() {
   return (
     <AuthTemplate
       titulo="Inicia sesion"
-      descripcion="Usa las credenciales asignadas a tu membresia activa. El acceso local ya esta conectado a Supabase."
+      descripcion="Ingresa con tu cuenta de administrador o empleado. El perfil activo determina el acceso a tus datos."
     >
       <LoginForm accion={iniciarSesionAction} />
     </AuthTemplate>

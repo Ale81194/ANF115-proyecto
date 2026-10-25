@@ -31,14 +31,14 @@ export default async function LayoutPrivado({
     return (
       <AuthTemplate
         titulo="Acceso pendiente"
-        descripcion="Tu identidad es valida, pero todavia no tiene una membresia activa en una empresa."
+        descripcion="Tu cuenta está autenticada, pero su perfil todavía no está activo."
       >
         <div className="space-y-4">
           <div className="rounded-input border border-advertencia/30 bg-advertencia/10 px-4 py-3 text-sm leading-relaxed text-advertencia">
             <p className="font-semibold">{estado.usuarioNombre}</p>
             <p className="text-xs">{estado.usuarioCorreo}</p>
             <p className="mt-2 text-xs">
-              Pedile a un administrador que active tu membresia. Mientras tanto
+              Solicita a un administrador que active tu perfil. Mientras tanto
               no se muestra informacion financiera.
             </p>
           </div>

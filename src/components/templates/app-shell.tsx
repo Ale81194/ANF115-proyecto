@@ -1,8 +1,9 @@
 import { LogOut, UserRound } from "lucide-react";
 import { Suspense } from "react";
 import type * as React from "react";
+import Link from "next/link";
+import { rutas } from "@/config/rutas";
 import { SourceBadge } from "@/components/molecules/source-badge";
-import { PeriodSelector } from "@/components/molecules/period-selector";
 import { Sidebar } from "@/components/organisms/navegacion/sidebar";
 import type { GrupoNavegacion } from "@/config/navegacion";
 import type { Permiso } from "@/config/permisos";
@@ -50,7 +51,7 @@ export function AppShell({
       </a>
 
       <Suspense fallback={<SidebarFallback />}>
-        <Sidebar permisos={permisos} grupos={grupos} />
+        <Sidebar permisos={permisos} grupos={grupos} cerrarSesion={cerrarSesion} />
       </Suspense>
 
       <div className="flex min-w-0 flex-1 flex-col pt-14 lg:pt-0">
@@ -67,9 +68,8 @@ export function AppShell({
 
             <div className="flex shrink-0 items-center gap-3">
               <SourceBadge origen={contexto.origenDatos} />
-              <PeriodSelector />
               <div className="h-7 w-px bg-borde" aria-hidden="true" />
-              <div className="flex items-center gap-2 rounded-input border border-borde bg-superficie px-3 py-1.5">
+              <Link href={rutas.usuarios.propio} className="flex items-center gap-2 rounded-input border border-borde bg-superficie px-3 py-1.5" aria-label="Consultar mi perfil">
                 <span className="flex size-7 items-center justify-center rounded-full bg-superficie-tenue text-texto-suave">
                   <UserRound aria-hidden="true" className="size-3.5" />
                 </span>
@@ -81,7 +81,7 @@ export function AppShell({
                     {contexto.usuarioCorreo}
                   </p>
                 </div>
-              </div>
+              </Link>
               <form action={cerrarSesion}>
                 <button
                   type="submit"
@@ -109,7 +109,7 @@ export function AppShell({
           <div className="mx-auto flex w-full max-w-[var(--ancho-contenido)] flex-col gap-1 text-[11px] text-texto-suave sm:flex-row sm:items-center sm:justify-between">
             <p>Carlitos Finanzas &middot; Proyecto academico ANF</p>
             <p>
-              Fase 01 &middot; Catalogo y periodos &middot; datos simulados
+              Control de ingresos y gastos &middot; datos simulados
             </p>
           </div>
         </footer>

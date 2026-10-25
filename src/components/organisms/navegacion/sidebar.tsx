@@ -8,16 +8,17 @@ import { useEffect, useRef, useState } from "react";
 import {
   filtrarNavegacion,
   navegacion,
-  navegacionPrincipal,
   type GrupoNavegacion,
   type ItemNavegacion,
 } from "@/config/navegacion";
 import type { Permiso } from "@/config/permisos";
 import { cn } from "@/lib/utils";
+import { rutas } from "@/config/rutas";
 
 type SidebarProps = {
   permisos?: readonly Permiso[];
   grupos?: readonly GrupoNavegacion[];
+  cerrarSesion?: () => Promise<void>;
 };
 
 function esRutaActiva(pathname: string, href: string): boolean {
@@ -67,10 +68,12 @@ function ContenidoSidebar({
   pathname,
   grupos,
   alNavegar,
+  cerrarSesion,
 }: {
   pathname: string;
   grupos: readonly GrupoNavegacion[];
   alNavegar?: () => void;
+  cerrarSesion?: () => Promise<void>;
 }) {
   return (
     <div className="flex h-full flex-col">
@@ -100,12 +103,6 @@ function ContenidoSidebar({
         aria-label="Navegacion principal"
         className="scrollbar-menu flex-1 space-y-5 overflow-y-auto px-3 py-5"
       >
-        <ItemEnlace
-          item={navegacionPrincipal}
-          pathname={pathname}
-          alNavegar={alNavegar}
-        />
-
         {grupos.map((grupo) => (
           <div key={grupo.id} className="space-y-1">
             <p className="px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-crema-100/40">
@@ -124,7 +121,9 @@ function ContenidoSidebar({
       </nav>
 
       <div className="space-y-1 border-t border-white/10 px-5 py-4 text-[11px] text-crema-100/50">
-        <p>Fase 01 &middot; Base y acceso</p>
+        <Link href={rutas.usuarios.propio} onClick={alNavegar} className="mb-2 block py-1 text-crema-50 underline">Mi perfil</Link>
+        {cerrarSesion && <form action={cerrarSesion}><button className="mb-2 py-1 text-crema-50 underline">Cerrar sesión</button></form>}
+        <p>Control de ingresos y gastos</p>
         <p>Datos simulados &middot; uso academico</p>
       </div>
     </div>
@@ -137,10 +136,12 @@ function ContenidoSidebar({
  * En escritorio permanece fija; en pantallas pequenas se abre como dialogo.
  * La visibilidad del menu no sustituye la autorizacion del servidor.
  */
-export function Sidebar({ permisos, grupos }: SidebarProps) {
+export function Sidebar({ permisos, grupos, cerrarSesion }: SidebarProps) {
   const pathname = usePathname();
   const [abierto, setAbierto] = useState(false);
   const botonCerrar = useRef<HTMLButtonElement>(null);
+  const botonAbrir = useRef<HTMLButtonElement>(null);
+  const dialogo = useRef<HTMLDivElement>(null);
 
   const gruposVisibles = permisos
     ? filtrarNavegacion(permisos)
@@ -152,10 +153,21 @@ export function Sidebar({ permisos, grupos }: SidebarProps) {
     }
 
     botonCerrar.current?.focus();
+    const devolverFoco = botonAbrir.current;
 
     const alPresionar = (evento: KeyboardEvent) => {
       if (evento.key === "Escape") {
         setAbierto(false);
+      }
+      if (evento.key === "Tab") {
+        const controles = dialogo.current?.querySelectorAll<HTMLElement>('a[href],button:not([disabled]),input:not([disabled])');
+        const primero = controles?.[0];
+        const ultimo = controles?.[controles.length - 1];
+        if (evento.shiftKey && document.activeElement === primero) {
+          evento.preventDefault(); ultimo?.focus();
+        } else if (!evento.shiftKey && document.activeElement === ultimo) {
+          evento.preventDefault(); primero?.focus();
+        }
       }
     };
 
@@ -165,6 +177,7 @@ export function Sidebar({ permisos, grupos }: SidebarProps) {
     return () => {
       document.removeEventListener("keydown", alPresionar);
       document.body.style.overflow = "";
+      devolverFoco?.focus();
     };
   }, [abierto]);
 
@@ -172,6 +185,7 @@ export function Sidebar({ permisos, grupos }: SidebarProps) {
     <>
       <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-3 border-b border-borde bg-crema-50/95 px-4 backdrop-blur lg:hidden">
         <button
+          ref={botonAbrir}
           type="button"
           onClick={() => setAbierto(true)}
           className="rounded-input p-2 text-texto transition-colors hover:bg-superficie-tenue"
@@ -196,7 +210,7 @@ export function Sidebar({ permisos, grupos }: SidebarProps) {
 
       <aside className="hidden w-[var(--ancho-sidebar)] shrink-0 bg-cafe-900 lg:block">
         <div className="fixed inset-y-0 left-0 w-[var(--ancho-sidebar)]">
-          <ContenidoSidebar pathname={pathname} grupos={gruposVisibles} />
+          <ContenidoSidebar pathname={pathname} grupos={gruposVisibles} cerrarSesion={cerrarSesion} />
         </div>
       </aside>
 
@@ -209,6 +223,7 @@ export function Sidebar({ permisos, grupos }: SidebarProps) {
             onClick={() => setAbierto(false)}
           />
           <div
+            ref={dialogo}
             id="menu-lateral-movil"
             role="dialog"
             aria-modal="true"
@@ -228,6 +243,7 @@ export function Sidebar({ permisos, grupos }: SidebarProps) {
               pathname={pathname}
               grupos={gruposVisibles}
               alNavegar={() => setAbierto(false)}
+              cerrarSesion={cerrarSesion}
             />
           </div>
         </div>

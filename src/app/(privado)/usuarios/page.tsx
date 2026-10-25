@@ -1,11 +1,23 @@
-import type { Metadata } from "next";
-import { ModulePlaceholder } from "@/components/molecules/module-placeholder";
-import { pantallas } from "@/config/pantallas";
+import { connection } from "next/server";
+import Link from "next/link";
+import { consultarAdministracion } from "@/controladores/finanzas.controller";
+import { AdministrationWorkspace } from "@/components/organisms/administration-workspace";
+import { OperationError } from "@/components/molecules/operation-error";
+import { guardarOperacion } from "../operaciones";
 
-export const metadata: Metadata = {
-  title: "Usuarios",
-};
+export const metadata = { title: "Usuarios" };
+export const instant = false;
 
-export default function Page() {
-  return <ModulePlaceholder pantalla={pantallas.usuarios.lista} />;
+export default async function Page({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  await connection();
+  const q = await searchParams;
+  const pagina = typeof q.pagina === "string" && /^\d{1,6}$/.test(q.pagina) ? Math.max(1, Number(q.pagina)) : 1;
+  const r = await consultarAdministracion("usuarios", pagina);
+  if (!r.ok) return <OperationError mensaje={r.error.mensaje} />;
+  return <><AdministrationWorkspace modulo="usuarios" {...r.datos} accion={guardarOperacion} />
+    <nav className="mt-5 flex justify-between text-sm" aria-label="Páginas de usuarios">
+      {pagina > 1 ? <Link href={`?pagina=${pagina - 1}`}>Anterior</Link> : <span />}
+      <span>Página {pagina} · {r.datos.total} usuarios</span>
+      {pagina * 50 < r.datos.total ? <Link href={`?pagina=${pagina + 1}`}>Siguiente</Link> : <span />}
+    </nav></>;
 }
