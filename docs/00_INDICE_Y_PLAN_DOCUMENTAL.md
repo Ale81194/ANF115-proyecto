@@ -1,5 +1,10 @@
 # Carlitos Finanzas — Índice y plan documental
 
+> **Actualización 25/10/2026:** el alcance vigente es el de siete módulos.
+> Consultar [la reconstrucción](implementacion/22_RECONSTRUCCION_SIETE_MODULOS.md)
+> y `nueva documentacion/`. Las cinco fases y el modelo contable descritos en
+> este índice se conservan como antecedentes, no como alcance de la entrega.
+
 **Versión documental:** 0.1. **Fecha:** 19 de octubre de 2026. **Idioma:** español.
 
 ## 1. Qué contiene este paquete

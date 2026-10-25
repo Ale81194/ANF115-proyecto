@@ -1,5 +1,17 @@
 # AGENTS.md — Reglas del proyecto Carlitos Finanzas
 
+## Alcance vigente desde el 25/10/2026
+
+Por instrucción del usuario, la entrega se reconstruye con los siete módulos
+del PDF y `docs/nueva documentacion/`: usuarios, ingresos, gastos, categorías,
+panel financiero, reportes y seguridad/bitácora. Se conserva el stack Next.js,
+React, TypeScript, Tailwind y Supabase **local**; no Vite ni PHP/MySQL.
+`docs/implementacion/22_RECONSTRUCCION_SIETE_MODULOS.md` documenta la adaptación.
+Las fases contables, roles analista/gerencia y membresías que aparecen debajo
+son antecedentes; no deben volver a imponerse al nuevo flujo. Se conservan las
+reglas de precisión, capas, RPC financieras, seguridad, accesibilidad y evidencia.
+No usar el conector Supabase remoto: actualmente corresponde a otro proyecto.
+
 Este archivo es el contrato de trabajo para cualquier persona o agente que
 modifique el repositorio. Antes de escribir código, leer la documentación de la
 fase correspondiente en `docs/`.
