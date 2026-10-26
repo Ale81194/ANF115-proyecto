@@ -32,6 +32,9 @@ export type Movimiento = {
   creado_por: string;
   revision: number;
   motivo_anulacion: string | null;
+  anulado_por: string | null;
+  anulado_en: string | null;
+  anulador: string | null;
 };
 
 export type FiltroFinanciero = {
@@ -39,6 +42,7 @@ export type FiltroFinanciero = {
   hasta: string;
   categoria?: string;
   tipo?: TipoMovimiento;
+  estado?: "vigente" | "anulado";
   granularidad: "dia" | "mes" | "anio";
 };
 

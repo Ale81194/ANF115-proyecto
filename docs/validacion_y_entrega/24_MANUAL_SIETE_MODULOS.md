@@ -33,8 +33,9 @@ sobrescribe una revisión distinta silenciosamente.
 
 «Anular» exige un motivo de 5–500 caracteres y confirmación. Es definitivo: el
 registro se conserva, deja de formar parte de los indicadores y no admite otra
-edición ni reactivación. El empleado solo puede operar sobre sus movimientos;
-el administrador también puede corregir los autorizados del negocio.
+edición ni reactivación. La interfaz no ofrece corrección después del alta. El
+empleado solo puede anular sus movimientos; el administrador puede anular los
+movimientos autorizados del negocio.
 
 ## Categorías
 
@@ -56,10 +57,12 @@ alta. El sistema impide desactivar o degradar al último administrador activo.
 
 ## Panel y reportes
 
-Aplicar fechas inicial/final y categoría. El rango incluye ambos extremos y no
-puede superar una diferencia de 3660 días. El panel presenta cuatro indicadores
-y gráficos; Reportes añade agrupaciones por día, mes o año y el detalle paginado.
-La paginación no cambia los totales del filtro. Se completan períodos vacíos.
+Aplicar fechas inicial/final, categoría y estado del detalle. El rango incluye
+ambos extremos y no puede superar una diferencia de 3660 días. «Vigentes» y
+«Anulados» filtran el listado paginado; no alteran los indicadores, que excluyen
+siempre los anulados. El panel presenta cuatro indicadores y gráficos; Reportes
+añade agrupaciones por día, mes o año. La paginación no cambia los totales del
+filtro financiero. Se completan períodos vacíos.
 
 Si ingresos = 0, el porcentaje de gastos es «No aplica»; no es cero por defecto.
 Un resultado negativo se muestra con signo. El resultado representa cobros menos

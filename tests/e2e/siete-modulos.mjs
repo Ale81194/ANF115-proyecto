@@ -43,18 +43,16 @@ try {
       const row = page.getByRole("row").filter({ hasText: concepto });
       await row.waitFor();
       assert.ok((await row.innerText()).includes("$25.50"));
-      await row.getByText("Corregir", { exact: true }).click();
-      const editar = row.locator("details").first().locator("form");
-      await editar.getByLabel(/Monto USD/).fill("20.25");
-      await editar.getByRole("button", { name: "Guardar", exact: true }).click();
-      await editar.getByRole("status").filter({ hasText: "Operación confirmada" }).waitFor();
-      assert.ok((await row.innerText()).includes("$20.25"));
       await row.getByText("Anular", { exact: true }).click();
-      const anular = row.locator("details").nth(1).locator("form");
+      const anular = row.locator("details").first().locator("form");
       await anular.getByLabel(/Motivo de anulación/).fill("Cierre de prueba E2E con datos simulados");
       await anular.getByRole("button", { name: "Confirmar anulación" }).click();
-      await row.getByText("anulado", { exact: true }).waitFor();
-      console.log(`PASS: ${rol} ${tipo} create, edit, void through browser`);
+      await row.getByText("Anulado", { exact: true }).waitFor();
+      await page.getByLabel("Estado").selectOption("anulado");
+      await page.getByRole("button", { name: "Aplicar filtros" }).click();
+      await page.waitForURL("**estado=anulado**");
+      await page.getByRole("row").filter({ hasText: concepto }).waitFor();
+      console.log(`PASS: ${rol} ${tipo} create, void and status filter through browser`);
     }
     await page.goto(`${base}/usuarios`);
     if (rol === "administrador") {

@@ -24,6 +24,12 @@ Exportar PDF/XLSX es complementario, no criterio del núcleo.
 - `perfiles`, `categorias`, `ingresos`, `gastos`, `bitacora`: cinco tablas operativas.
 - Importes positivos con hasta dos decimales, transporte exclusivamente texto.
 - Anulación definitiva con motivo; no hay borrado de movimientos.
+- La interfaz no ofrece corrección de movimientos: después del alta solo permite
+  anular con motivo. El contrato de actualización se conserva en servidor por
+  compatibilidad, pero no se expone como acción de la entrega.
+- El detalle admite filtro URL por estado (`vigente` o `anulado`). Este filtro
+  afecta únicamente el listado paginado; los indicadores continúan calculándose
+  con movimientos vigentes sobre las fechas, categoría y tipo seleccionados.
 - Toda modificación de movimiento incluye revisión esperada; creación incluye
   solicitud UUID estable y comprueba que el contenido del reintento coincida.
 - Servidor por solicitud, autorización en controlador y PostgreSQL/RLS.

@@ -39,6 +39,7 @@ export async function leerMovimientos(f: FiltroFinanciero, pagina: number) {
     .gte("fecha", f.desde).lte("fecha", f.hasta);
   if (f.tipo) q = q.eq("tipo", f.tipo);
   if (f.categoria) q = q.eq("categoria_id", f.categoria);
+  if (f.estado) q = q.eq("estado", f.estado);
   const { data, error, count } = await q.order("fecha", { ascending: false }).order("id", { ascending: false })
     .range((pagina - 1) * 50, pagina * 50 - 1);
   comprobarError(error);
