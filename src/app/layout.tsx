@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     template: "%s \u00b7 Carlitos Finanzas",
   },
   description:
-    "Control de ingresos y gastos, indicadores y reportes de Panadería Carlitos. Proyecto académico con datos simulados.",
+    "Control de ingresos y gastos, indicadores y reportes de Panadería Carlitos.",
   applicationName: "Carlitos Finanzas",
   icons: {
     icon: "/branding/favicon.svg",

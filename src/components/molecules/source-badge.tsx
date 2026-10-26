@@ -23,12 +23,12 @@ export function SourceBadge({
       className={cn("font-medium", className)}
       title={
         esSimulado
-          ? "Datos simulados con fines academicos"
+          ? "Información de demostración"
           : "Datos declarados como reales por la empresa"
       }
     >
       {esSimulado
-        ? "Datos simulados \u00b7 uso academico"
+        ? "Datos simulados"
         : "Datos reales"}
     </Badge>
   );

@@ -23,7 +23,7 @@ async function main() {
   if (error) throw new Error("No se pudo consultar Auth local.");
   for (const [email, nombre, rol] of [
     ["admin@carlitos.local", "Administración Carlitos", "administrador"],
-    ["empleado@carlitos.local", "Empleado Carlitos", "empleado"],
+    ["empleado@carlitos.local", "Karla Girón", "empleado"],
   ]) {
     let id = data.users.find((u) => u.email === email)?.id;
     if (!id) {

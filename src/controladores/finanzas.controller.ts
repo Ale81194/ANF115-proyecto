@@ -44,7 +44,7 @@ export async function consultarAdministracion(
 ) {
   const requestId = generarRequestId();
   try {
-    const { perfil } = await requerirPerfilOperativo(modulo === "usuarios" || modulo === "bitacora");
+    const { perfil, user } = await requerirPerfilOperativo(modulo === "usuarios" || modulo === "bitacora");
     const activoCategoria = modulo === "categorias"
       ? (perfil.rol === "administrador"
           ? (estadoCategoria ? estadoCategoria === "activa" : undefined)
@@ -57,7 +57,8 @@ export async function consultarAdministracion(
       modulo === "usuarios" ? leerPerfiles(pagina) : Promise.resolve({ perfiles: [], total: 0 }),
       modulo === "bitacora" ? leerBitacora(pagina) : Promise.resolve({ eventos: [], total: 0 }),
     ]);
-    return ok({ perfil, categorias, perfiles: usuarios.perfiles, eventos: bitacora.eventos, tipoCategoria, estadoCategoria,
+    return ok({ perfil, correoPerfil: modulo === "perfil" ? (user.email ?? "") : undefined,
+      categorias, perfiles: usuarios.perfiles, eventos: bitacora.eventos, tipoCategoria, estadoCategoria,
       total: modulo === "usuarios" ? usuarios.total : bitacora.total }, requestId);
   } catch (e) { return desdeError(e, requestId); }
 }
