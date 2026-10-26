@@ -36,13 +36,13 @@ function formatearFechaHora(valor: string | null): string {
 
 function camposMovimiento(data: VistaFinanciera, tipo: "ingreso" | "gasto", m?: Movimiento): CampoOperacion[] {
   return [
-    { nombre: "concepto", etiqueta: "Concepto", requerido: true, valor: m?.concepto, maxLength: 250 },
-    { nombre: "monto", etiqueta: "Monto USD (ejemplo: 25.50)", requerido: true, valor: m?.monto },
+    { nombre: "concepto", etiqueta: "Concepto", requerido: true, valor: m?.concepto, maxLength: 250,
+      placeholder: tipo === "ingreso" ? "Ej. Venta de pan integral o repostería" : "Ej. Compra de insumos o pago de servicio" },
+    { nombre: "monto", etiqueta: "Monto (USD)", requerido: true, valor: m?.monto, placeholder: "0.00" },
     { nombre: "fecha", etiqueta: "Fecha", tipo: "date", requerido: true, valor: m?.fecha ?? data.fechaSugerida },
     { nombre: "categoria_id", etiqueta: "Categoría", tipo: "select", requerido: true, valor: m?.categoria_id,
-      opciones: [{ valor: "", etiqueta: "Seleccione una categoría" }, ...data.categorias.filter((c) => c.tipo === tipo && (c.activo || c.id === m?.categoria_id))
+      opciones: [{ valor: "", etiqueta: "Selecciona una categoría" }, ...data.categorias.filter((c) => c.tipo === tipo && (c.activo || c.id === m?.categoria_id))
         .map((c) => ({ valor: c.id, etiqueta: `${c.codigo} · ${c.nombre}${c.activo ? "" : " (histórica)"}` }))] },
-    { nombre: "referencia", etiqueta: "Referencia (opcional)", valor: m?.referencia ?? "", maxLength: 120 },
   ];
 }
 
@@ -89,10 +89,18 @@ export function FinanceWorkspace({ data, modulo, accion }: {
           <div className="mt-2 h-2 rounded bg-superficie-tenue"><div className="h-full rounded bg-primario" style={{ width: `${c.ancho}%` }} /></div></div>)}
       </section>
     </div>}
-    {movimiento && <section id="nueva-captura" className="scroll-mt-24 rounded-card border border-borde bg-superficie p-6">
-      <h2 className="mb-4 font-serif text-2xl">Registrar {modulo}</h2>
+    {movimiento && <section id="nueva-captura" className="scroll-mt-24 rounded-card border border-borde bg-superficie p-6 shadow-card sm:p-7">
+      <header className="mb-7 flex items-start gap-4">
+        <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primario/10 text-primario">
+          <Banknote aria-hidden="true" className="size-6" />
+        </span>
+        <div>
+          <h2 className="font-serif text-3xl">Registrar {modulo}</h2>
+          <p className="mt-1 text-sm text-texto-suave">Completa la información del {modulo} que deseas registrar en el sistema.</p>
+        </div>
+      </header>
       <OperationForm accion={accion} operacion="movimiento" ocultos={{ tipo: modulo }} solicitud={crypto.randomUUID()}
-        campos={camposMovimiento(data, modulo)} texto={`Guardar ${modulo}`} />
+        campos={camposMovimiento(data, modulo)} texto={`Guardar ${modulo}`} presentacion="movimiento" />
     </section>}
     {modulo === "reportes" && <section className="rounded-card border border-borde bg-superficie p-5">
       <h2 className="mb-4 font-serif text-xl">Resumen {data.filtro.granularidad === "dia" ? "diario" : data.filtro.granularidad === "mes" ? "mensual" : "anual"}</h2>

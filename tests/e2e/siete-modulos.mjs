@@ -35,9 +35,9 @@ try {
       await page.goto(`${base}/${path}`);
       const concepto = `E2E SIMULADO ${rol} ${tipo} ${Date.now()}`;
       const alta = page.locator("#nueva-captura form");
-      await alta.getByLabel("Concepto", { exact: true }).fill(concepto);
-      await alta.getByLabel(/Monto USD/).fill("25.50");
-      await alta.getByLabel("Categoría", { exact: true }).selectOption({ index: 1 });
+      await alta.getByLabel(/^Concepto/).fill(concepto);
+      await alta.getByLabel(/^Monto/).fill("25.50");
+      await alta.getByLabel(/^Categoría/).selectOption({ index: 1 });
       await alta.getByRole("button", { name: `Guardar ${tipo}` }).click();
       await alta.getByRole("status").filter({ hasText: "Operación confirmada" }).waitFor();
       const row = page.getByRole("row").filter({ hasText: concepto });

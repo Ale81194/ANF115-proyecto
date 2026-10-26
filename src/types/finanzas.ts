@@ -96,6 +96,7 @@ export type CampoOperacion = {
   requerido?: boolean;
   opciones?: { valor: string; etiqueta: string }[];
   maxLength?: number;
+  placeholder?: string;
 };
 
 export type AccionOperacion = (estado: EstadoOperacion, datos: FormData) => Promise<EstadoOperacion>;
