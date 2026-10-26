@@ -5,7 +5,7 @@ import { crearClienteAdmin } from "@/supabase/admin";
 import type { FinanzasDatabase } from "@/supabase/finanzas.types";
 import { ErrorDominio } from "@/lib/errores";
 import { aImporteCanonico } from "@/lib/decimal";
-import type { FiltroFinanciero } from "@/types/finanzas";
+import type { FiltroFinanciero, TipoMovimiento } from "@/types/finanzas";
 
 const decimal = z.string().regex(/^-?\d+(?:\.\d{1,2})?$/).transform(aImporteCanonico);
 const resumen = z.object({ ingresos: decimal, gastos: decimal, resultado: decimal,
@@ -26,9 +26,12 @@ export function comprobarError(error: { code?: string; message?: string } | null
   throw new ErrorDominio("INTEGRACION_NO_DISPONIBLE");
 }
 
-export async function leerCategorias() {
+export async function leerCategorias(tipo?: TipoMovimiento, activo?: boolean) {
   const c = await crearClienteFinanzas();
-  const { data, error } = await c.from("categorias").select("id,codigo,nombre,tipo,descripcion,activo,actualizado_en").order("codigo");
+  let consulta = c.from("categorias").select("id,codigo,nombre,tipo,descripcion,activo,actualizado_en");
+  if (tipo) consulta = consulta.eq("tipo", tipo);
+  if (activo !== undefined) consulta = consulta.eq("activo", activo);
+  const { data, error } = await consulta.order("codigo");
   comprobarError(error);
   return data ?? [];
 }
@@ -39,6 +42,7 @@ export async function leerMovimientos(f: FiltroFinanciero, pagina: number) {
     .gte("fecha", f.desde).lte("fecha", f.hasta);
   if (f.tipo) q = q.eq("tipo", f.tipo);
   if (f.categoria) q = q.eq("categoria_id", f.categoria);
+  if (f.estado) q = q.eq("estado", f.estado);
   const { data, error, count } = await q.order("fecha", { ascending: false }).order("id", { ascending: false })
     .range((pagina - 1) * 50, pagina * 50 - 1);
   comprobarError(error);
@@ -57,11 +61,27 @@ export async function leerReporte(f: FiltroFinanciero) {
   return validado.data;
 }
 
-export async function leerPerfiles(pagina: number) {
+export async function leerPerfiles(pagina: number, filtros?: {
+  buscar?: string;
+  rol?: "administrador" | "empleado";
+  activo?: boolean;
+}) {
   const c = await crearClienteFinanzas();
-  const { data, error, count } = await c.from("perfiles").select("usuario_id,nombre,rol,activo,actualizado_en", { count: "exact" })
-    .order("nombre").order("usuario_id").range((pagina - 1) * 50, pagina * 50 - 1);
-  comprobarError(error); return { perfiles: data ?? [], total: count ?? 0 };
+  const { data, error } = await c.from("perfiles").select("usuario_id,nombre,rol,activo,actualizado_en")
+    .order("nombre").order("usuario_id");
+  comprobarError(error);
+  const { data: identidades, error: authError } = await crearClienteAdmin().auth.admin.listUsers({ page: 1, perPage: 1000 });
+  if (authError) throw new ErrorDominio("INTEGRACION_NO_DISPONIBLE", "No se pudieron consultar las identidades de usuarios.");
+  const porId = new Map(identidades.users.map((usuario) => [usuario.id, usuario]));
+  const buscar = filtros?.buscar?.toLocaleLowerCase("es") ?? "";
+  const perfiles = (data ?? []).map((perfil) => {
+    const identidad = porId.get(perfil.usuario_id);
+    return { ...perfil, correo: identidad?.email ?? "Correo no disponible", creado_en: identidad?.created_at ?? perfil.actualizado_en };
+  }).filter((perfil) =>
+    (!filtros?.rol || perfil.rol === filtros.rol)
+    && (filtros?.activo === undefined || perfil.activo === filtros.activo)
+    && (!buscar || `${perfil.nombre} ${perfil.correo} ${perfil.usuario_id}`.toLocaleLowerCase("es").includes(buscar)));
+  return { perfiles: perfiles.slice((pagina - 1) * 50, pagina * 50), total: perfiles.length };
 }
 
 export async function leerBitacora(pagina: number) {
@@ -69,7 +89,35 @@ export async function leerBitacora(pagina: number) {
   const { data, error, count } = await c.from("bitacora")
     .select("id,actor_id,fecha_hora,accion,entidad,registro_id,motivo,antes,despues", { count: "exact" })
     .order("fecha_hora", { ascending: false }).order("id").range((pagina - 1) * 50, pagina * 50 - 1);
-  comprobarError(error); return { eventos: data ?? [], total: count ?? 0 };
+  comprobarError(error);
+  const eventos = data ?? [];
+  const ids = [...new Set(eventos.flatMap((evento) => evento.actor_id ? [evento.actor_id] : []))];
+  const { data: actores, error: actoresError } = ids.length > 0
+    ? await c.from("perfiles").select("usuario_id,nombre").in("usuario_id", ids)
+    : { data: [], error: null };
+  comprobarError(actoresError);
+  const nombres = new Map((actores ?? []).map((actor) => [actor.usuario_id, actor.nombre]));
+  return { eventos: eventos.map((evento) => ({
+    ...evento,
+    actor_nombre: evento.actor_id ? (nombres.get(evento.actor_id) ?? "Usuario no disponible") : null,
+  })), total: count ?? 0 };
+}
+
+export async function leerActividadUsuarios(ids: string[]) {
+  if (ids.length === 0) return [];
+  const c = await crearClienteFinanzas();
+  const { data, error } = await c.from("bitacora")
+    .select("id,actor_id,fecha_hora,accion,entidad,registro_id,motivo,antes,despues")
+    .in("actor_id", ids).order("fecha_hora", { ascending: false }).limit(200);
+  comprobarError(error);
+  const { data: actores, error: actoresError } = await c.from("perfiles")
+    .select("usuario_id,nombre").in("usuario_id", ids);
+  comprobarError(actoresError);
+  const nombres = new Map((actores ?? []).map((actor) => [actor.usuario_id, actor.nombre]));
+  return (data ?? []).map((evento) => ({
+    ...evento,
+    actor_nombre: evento.actor_id ? (nombres.get(evento.actor_id) ?? "Usuario no disponible") : null,
+  }));
 }
 
 type Funciones = FinanzasDatabase["public"]["Functions"];

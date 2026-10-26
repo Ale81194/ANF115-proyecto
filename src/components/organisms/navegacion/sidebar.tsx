@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { LogOut, Menu, UserRound, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   filtrarNavegacion,
@@ -19,6 +19,7 @@ type SidebarProps = {
   permisos?: readonly Permiso[];
   grupos?: readonly GrupoNavegacion[];
   cerrarSesion?: () => Promise<void>;
+  perfil?: { nombre: string; rol: string };
 };
 
 function esRutaActiva(pathname: string, href: string): boolean {
@@ -69,19 +70,21 @@ function ContenidoSidebar({
   grupos,
   alNavegar,
   cerrarSesion,
+  perfil,
 }: {
   pathname: string;
   grupos: readonly GrupoNavegacion[];
   alNavegar?: () => void;
   cerrarSesion?: () => Promise<void>;
+  perfil?: { nombre: string; rol: string };
 }) {
   return (
     <div className="flex h-full flex-col">
-      <div className="border-b border-white/10 px-5 pb-5 pt-6">
+      <div className="border-b border-white/10 px-6 py-6">
         <Link
           href="/dashboard"
           onClick={alNavegar}
-          className="block rounded-input focus-visible:outline-crema-50"
+          className="block w-fit rounded-input focus-visible:outline-crema-50"
           aria-label="Panaderia Carlitos Finanzas, ir al dashboard"
         >
           <Image
@@ -94,9 +97,6 @@ function ContenidoSidebar({
             priority
           />
         </Link>
-        <p className="mt-3 text-[11px] uppercase tracking-[0.18em] text-crema-100/50">
-          Sistema financiero academico
-        </p>
       </div>
 
       <nav
@@ -120,11 +120,15 @@ function ContenidoSidebar({
         ))}
       </nav>
 
-      <div className="space-y-1 border-t border-white/10 px-5 py-4 text-[11px] text-crema-100/50">
-        <Link href={rutas.usuarios.propio} onClick={alNavegar} className="mb-2 block py-1 text-crema-50 underline">Mi perfil</Link>
-        {cerrarSesion && <form action={cerrarSesion}><button className="mb-2 py-1 text-crema-50 underline">Cerrar sesión</button></form>}
-        <p>Control de ingresos y gastos</p>
-        <p>Datos simulados &middot; uso academico</p>
+      <div className="border-t border-white/10 p-4">
+        <div className="flex items-center gap-2 rounded-card border border-white/10 bg-white/5 p-2">
+          <Link href={rutas.usuarios.propio} onClick={alNavegar} className="flex min-w-0 flex-1 items-center gap-3 rounded-input p-1 text-crema-50 transition-colors hover:bg-white/10">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-dorado-400/15 text-dorado-400"><UserRound aria-hidden="true" className="size-5" /></span>
+            <span className="min-w-0"><span className="block truncate text-sm font-semibold">{perfil?.nombre ?? "Mi perfil"}</span>
+              <span className="block text-[11px] capitalize text-crema-100/60">{perfil?.rol}</span></span>
+          </Link>
+          {cerrarSesion && <form action={cerrarSesion}><button className="flex size-9 items-center justify-center rounded-input text-crema-100/60 transition-colors hover:bg-white/10 hover:text-crema-50" aria-label="Cerrar sesión" title="Cerrar sesión"><LogOut aria-hidden="true" className="size-4" /></button></form>}
+        </div>
       </div>
     </div>
   );
@@ -136,7 +140,7 @@ function ContenidoSidebar({
  * En escritorio permanece fija; en pantallas pequenas se abre como dialogo.
  * La visibilidad del menu no sustituye la autorizacion del servidor.
  */
-export function Sidebar({ permisos, grupos, cerrarSesion }: SidebarProps) {
+export function Sidebar({ permisos, grupos, cerrarSesion, perfil }: SidebarProps) {
   const pathname = usePathname();
   const [abierto, setAbierto] = useState(false);
   const botonCerrar = useRef<HTMLButtonElement>(null);
@@ -210,7 +214,7 @@ export function Sidebar({ permisos, grupos, cerrarSesion }: SidebarProps) {
 
       <aside className="hidden w-[var(--ancho-sidebar)] shrink-0 bg-cafe-900 lg:block">
         <div className="fixed inset-y-0 left-0 w-[var(--ancho-sidebar)]">
-          <ContenidoSidebar pathname={pathname} grupos={gruposVisibles} cerrarSesion={cerrarSesion} />
+          <ContenidoSidebar pathname={pathname} grupos={gruposVisibles} cerrarSesion={cerrarSesion} perfil={perfil} />
         </div>
       </aside>
 
@@ -244,6 +248,7 @@ export function Sidebar({ permisos, grupos, cerrarSesion }: SidebarProps) {
               grupos={gruposVisibles}
               alNavegar={() => setAbierto(false)}
               cerrarSesion={cerrarSesion}
+              perfil={perfil}
             />
           </div>
         </div>

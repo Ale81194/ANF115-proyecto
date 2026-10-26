@@ -24,6 +24,21 @@ Exportar PDF/XLSX es complementario, no criterio del núcleo.
 - `perfiles`, `categorias`, `ingresos`, `gastos`, `bitacora`: cinco tablas operativas.
 - Importes positivos con hasta dos decimales, transporte exclusivamente texto.
 - Anulación definitiva con motivo; no hay borrado de movimientos.
+- La interfaz no ofrece corrección de movimientos: después del alta solo permite
+  anular con motivo. El contrato de actualización se conserva en servidor por
+  compatibilidad, pero no se expone como acción de la entrega.
+- El detalle admite filtro URL por estado (`vigente` o `anulado`). Este filtro
+  afecta únicamente el listado paginado; los indicadores continúan calculándose
+  con movimientos vigentes sobre las fechas, categoría y tipo seleccionados.
+- Categorías admite filtro URL por tipo (`ingreso` o `gasto`). El empleado
+  consulta las categorías activas autorizadas con la explicación de uso del
+  catálogo operativo documentado; no se presentan como cuentas contables. El
+  administrador añade filtro de estado (`activa` o `inactiva`) y cambia ese
+  estado con el interruptor auditado de cada tarjeta. La edición separada exige
+  al menos un campo modificado antes de habilitar «Guardar».
+- Usuarios presenta filtros URL, estado mediante interruptor y un menú único de
+  acciones para editar nombre/rol, consultar identidad y revisar actividad. No
+  expone eliminación: la desactivación preserva referencias y bitácora.
 - Toda modificación de movimiento incluye revisión esperada; creación incluye
   solicitud UUID estable y comprueba que el contenido del reintento coincida.
 - Servidor por solicitud, autorización en controlador y PostgreSQL/RLS.

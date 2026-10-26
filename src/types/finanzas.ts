@@ -9,6 +9,11 @@ export type Perfil = {
   actualizado_en: string;
 };
 
+export type PerfilAdministrado = Perfil & {
+  correo: string;
+  creado_en: string;
+};
+
 export type Categoria = {
   id: string;
   codigo: string;
@@ -32,6 +37,9 @@ export type Movimiento = {
   creado_por: string;
   revision: number;
   motivo_anulacion: string | null;
+  anulado_por: string | null;
+  anulado_en: string | null;
+  anulador: string | null;
 };
 
 export type FiltroFinanciero = {
@@ -39,6 +47,7 @@ export type FiltroFinanciero = {
   hasta: string;
   categoria?: string;
   tipo?: TipoMovimiento;
+  estado?: "vigente" | "anulado";
   granularidad: "dia" | "mes" | "anio";
 };
 
@@ -62,6 +71,10 @@ export type EventoBitacora = {
   motivo: string | null;
   antes: unknown;
   despues: unknown;
+};
+
+export type EventoBitacoraVista = EventoBitacora & {
+  actor_nombre: string | null;
 };
 
 export type EstadoOperacion = {
@@ -92,6 +105,7 @@ export type CampoOperacion = {
   requerido?: boolean;
   opciones?: { valor: string; etiqueta: string }[];
   maxLength?: number;
+  placeholder?: string;
 };
 
 export type AccionOperacion = (estado: EstadoOperacion, datos: FormData) => Promise<EstadoOperacion>;

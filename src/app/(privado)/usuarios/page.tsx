@@ -12,12 +12,23 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   await connection();
   const q = await searchParams;
   const pagina = typeof q.pagina === "string" && /^\d{1,6}$/.test(q.pagina) ? Math.max(1, Number(q.pagina)) : 1;
-  const r = await consultarAdministracion("usuarios", pagina);
+  const buscar = typeof q.buscar === "string" ? q.buscar.trim().slice(0, 120) : undefined;
+  const rol = q.rol === "administrador" || q.rol === "empleado" ? q.rol : undefined;
+  const activo = q.estado === "activo" ? true : q.estado === "inactivo" ? false : undefined;
+  const filtros = { buscar: buscar || undefined, rol, activo };
+  const r = await consultarAdministracion("usuarios", pagina, undefined, undefined, filtros);
   if (!r.ok) return <OperationError mensaje={r.error.mensaje} />;
+  const paginaUrl = (destino: number) => {
+    const parametros = new URLSearchParams({ pagina: String(destino) });
+    if (buscar) parametros.set("buscar", buscar);
+    if (rol) parametros.set("rol", rol);
+    if (typeof q.estado === "string") parametros.set("estado", q.estado);
+    return `?${parametros}`;
+  };
   return <><AdministrationWorkspace modulo="usuarios" {...r.datos} accion={guardarOperacion} />
     <nav className="mt-5 flex justify-between text-sm" aria-label="Páginas de usuarios">
-      {pagina > 1 ? <Link href={`?pagina=${pagina - 1}`}>Anterior</Link> : <span />}
+      {pagina > 1 ? <Link href={paginaUrl(pagina - 1)}>Anterior</Link> : <span />}
       <span>Página {pagina} · {r.datos.total} usuarios</span>
-      {pagina * 50 < r.datos.total ? <Link href={`?pagina=${pagina + 1}`}>Siguiente</Link> : <span />}
+      {pagina * 50 < r.datos.total ? <Link href={paginaUrl(pagina + 1)}>Siguiente</Link> : <span />}
     </nav></>;
 }

@@ -1,7 +1,7 @@
 import "server-only";
 import { z } from "zod";
 import { requerirPerfilOperativo } from "@/auth/perfil-operativo";
-import { leerCategorias, leerMovimientos, leerReporte, leerPerfiles, leerBitacora,
+import { leerCategorias, leerMovimientos, leerReporte, leerPerfiles, leerBitacora, leerActividadUsuarios,
   persistirMovimiento, persistirAnulacion, persistirCategoria, persistirUsuario } from "@/repositorios/finanzas.repository";
 import { filtroFinancieroSchema, movimientoSchema, anulacionSchema, categoriaSchema, usuarioSchema } from "@/schemas/finanzas.schema";
 import { anchoComparativo } from "@/servicios/finanzas/resumen";
@@ -9,6 +9,7 @@ import { Decimal } from "@/lib/decimal";
 import { desdeError, generarRequestId, ok, fallo } from "@/lib/resultado";
 import { ErrorDominio } from "@/lib/errores";
 import { hoyEnElSalvador } from "@/lib/fechas";
+import type { TipoMovimiento } from "@/types/finanzas";
 
 type Query = Record<string, string | string[] | undefined>;
 function texto(q: Query, k: string) { return typeof q[k] === "string" ? q[k] : undefined; }
@@ -20,7 +21,8 @@ export async function consultarFinanzas(q: Query, tipo?: "ingreso" | "gasto") {
     const hoy = hoyEnElSalvador();
     const filtro = filtroFinancieroSchema.parse({ desde: texto(q, "desde") ?? `${hoy.slice(0, 7)}-01`,
       hasta: texto(q, "hasta") ?? hoy, categoria: texto(q, "categoria") || undefined,
-      tipo: tipo ?? (texto(q, "tipo") || undefined), granularidad: texto(q, "granularidad") ?? "mes" });
+      tipo: tipo ?? (texto(q, "tipo") || undefined), estado: texto(q, "estado") || undefined,
+      granularidad: texto(q, "granularidad") ?? "mes" });
     const pagina = z.coerce.number().int().min(1).max(100000).parse(texto(q, "pagina") ?? "1");
     const [categorias, listado, reporte] = await Promise.all([leerCategorias(), leerMovimientos(filtro, pagina), leerReporte(filtro)]);
     const maximo = Decimal.max(reporte.resumen.ingresos, reporte.resumen.gastos).toString();
@@ -29,21 +31,40 @@ export async function consultarFinanzas(q: Query, tipo?: "ingreso" | "gasto") {
       distribucion: reporte.categorias.map((c) => ({ ...c, ancho: anchoComparativo(c.monto, reporte.resumen.gastos) })),
     }, requestId);
   } catch (e) {
-    if (e instanceof z.ZodError) return fallo("VALIDACION_ENTRADA", requestId, { mensaje: "Revise fechas, categoría, tipo y página. El rango máximo es de 3660 días." });
+    if (e instanceof z.ZodError) return fallo("VALIDACION_ENTRADA", requestId, { mensaje: "Revise fechas, categoría, tipo, estado y página. El rango máximo es de 3660 días." });
     return desdeError(e, requestId);
   }
 }
 
-export async function consultarAdministracion(modulo: "usuarios" | "categorias" | "bitacora" | "perfil", pagina = 1) {
+export async function consultarAdministracion(
+  modulo: "usuarios" | "categorias" | "bitacora" | "perfil",
+  pagina = 1,
+  tipoCategoria?: TipoMovimiento,
+  estadoCategoria?: "activa" | "inactiva",
+  filtrosUsuarios?: { buscar?: string; rol?: "administrador" | "empleado"; activo?: boolean },
+) {
   const requestId = generarRequestId();
   try {
-    const { perfil } = await requerirPerfilOperativo(modulo === "usuarios" || modulo === "bitacora");
+    const { perfil, user } = await requerirPerfilOperativo(modulo === "usuarios" || modulo === "bitacora");
+    const activoCategoria = modulo === "categorias"
+      ? (perfil.rol === "administrador"
+          ? (estadoCategoria ? estadoCategoria === "activa" : undefined)
+          : true)
+      : undefined;
     const [categorias, usuarios, bitacora] = await Promise.all([
-      modulo === "categorias" ? leerCategorias() : Promise.resolve([]),
-      modulo === "usuarios" ? leerPerfiles(pagina) : Promise.resolve({ perfiles: [], total: 0 }),
+      modulo === "categorias"
+        ? leerCategorias(tipoCategoria, activoCategoria)
+        : Promise.resolve([]),
+      modulo === "usuarios" ? leerPerfiles(pagina, filtrosUsuarios) : Promise.resolve({ perfiles: [], total: 0 }),
       modulo === "bitacora" ? leerBitacora(pagina) : Promise.resolve({ eventos: [], total: 0 }),
     ]);
-    return ok({ perfil, categorias, perfiles: usuarios.perfiles, eventos: bitacora.eventos,
+    const actividadUsuarios = modulo === "usuarios"
+      ? await leerActividadUsuarios(usuarios.perfiles.map((usuario) => usuario.usuario_id))
+      : [];
+    return ok({ perfil, correoPerfil: modulo === "perfil" ? (user.email ?? "") : undefined,
+      categorias, perfiles: usuarios.perfiles,
+      eventos: modulo === "usuarios" ? actividadUsuarios : bitacora.eventos,
+      tipoCategoria, estadoCategoria, filtrosUsuarios,
       total: modulo === "usuarios" ? usuarios.total : bitacora.total }, requestId);
   } catch (e) { return desdeError(e, requestId); }
 }

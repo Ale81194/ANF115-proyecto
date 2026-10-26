@@ -51,7 +51,8 @@ export function AppShell({
       </a>
 
       <Suspense fallback={<SidebarFallback />}>
-        <Sidebar permisos={permisos} grupos={grupos} cerrarSesion={cerrarSesion} />
+        <Sidebar permisos={permisos} grupos={grupos} cerrarSesion={cerrarSesion}
+          perfil={{ nombre: contexto.usuarioNombre, rol: contexto.rolCodigo }} />
       </Suspense>
 
       <div className="flex min-w-0 flex-1 flex-col pt-14 lg:pt-0">
@@ -107,10 +108,8 @@ export function AppShell({
 
         <footer className="border-t border-borde bg-crema-50 px-4 py-4 sm:px-6 lg:px-8">
           <div className="mx-auto flex w-full max-w-[var(--ancho-contenido)] flex-col gap-1 text-[11px] text-texto-suave sm:flex-row sm:items-center sm:justify-between">
-            <p>Carlitos Finanzas &middot; Proyecto academico ANF</p>
-            <p>
-              Control de ingresos y gastos &middot; datos simulados
-            </p>
+            <p>Panadería Carlitos &middot; Finanzas</p>
+            <p>Control de ingresos y gastos &middot; datos simulados</p>
           </div>
         </footer>
       </div>

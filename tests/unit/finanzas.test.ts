@@ -25,6 +25,12 @@ describe("RF04–RF06: entradas", () => {
   it("rechaza más de 3660 días", () => {
     expect(filtroFinancieroSchema.safeParse({ desde: "2000-01-01", hasta: "2026-01-01" }).success).toBe(false);
   });
+  it("acepta estados de movimiento conocidos y rechaza otros", () => {
+    const base = { desde: "2026-10-01", hasta: "2026-10-31" };
+    expect(filtroFinancieroSchema.safeParse({ ...base, estado: "vigente" }).success).toBe(true);
+    expect(filtroFinancieroSchema.safeParse({ ...base, estado: "anulado" }).success).toBe(true);
+    expect(filtroFinancieroSchema.safeParse({ ...base, estado: "eliminado" }).success).toBe(false);
+  });
   it("exige revisión al editar", () => {
     expect(movimientoSchema.safeParse({ tipo: "ingreso", id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", solicitud_id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb", fecha: "2026-10-01", concepto: "Venta", monto: "25.00", categoria_id: "cccccccc-cccc-4ccc-8ccc-cccccccccccc" }).success).toBe(false);
   });

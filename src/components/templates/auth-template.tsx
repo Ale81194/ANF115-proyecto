@@ -49,7 +49,7 @@ export function AuthTemplate({
 
         <div className="relative mt-12 max-w-lg space-y-6 lg:mt-0">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-dorado-400">
-            Analisis financiero academico
+            Control financiero
           </p>
           <h1 className="font-serif text-3xl leading-tight text-crema-50 sm:text-4xl">
             Decisiones con numeros que se pueden explicar.
@@ -73,7 +73,7 @@ export function AuthTemplate({
 
         <div className="relative mt-12 flex flex-wrap items-center gap-3 text-[11px] text-crema-100/50 lg:mt-0">
           <SourceBadge className="border-dorado-400/30 bg-white/5 text-crema-100/80" />
-          <span>Proyecto ANF &middot; 2026</span>
+          <span>Panadería Carlitos &middot; 2026</span>
         </div>
       </section>
 
@@ -103,8 +103,8 @@ export function AuthTemplate({
           <div className="mt-8">{children}</div>
 
           <p className="mt-8 border-t border-borde pt-4 text-[11px] leading-relaxed text-texto-suave">
-            Sistema academico con datos simulados. El acceso local, las
-            perfiles y los permisos se resuelven en el servidor con Supabase.
+            Sistema con datos simulados. El acceso, los perfiles y los permisos
+            se resuelven en el servidor con Supabase.
           </p>
         </div>
       </section>

@@ -35,26 +35,24 @@ try {
       await page.goto(`${base}/${path}`);
       const concepto = `E2E SIMULADO ${rol} ${tipo} ${Date.now()}`;
       const alta = page.locator("#nueva-captura form");
-      await alta.getByLabel("Concepto", { exact: true }).fill(concepto);
-      await alta.getByLabel(/Monto USD/).fill("25.50");
-      await alta.getByLabel("Categoría", { exact: true }).selectOption({ index: 1 });
+      await alta.getByLabel(/^Concepto/).fill(concepto);
+      await alta.getByLabel(/^Monto/).fill("25.50");
+      await alta.getByLabel(/^Categoría/).selectOption({ index: 1 });
       await alta.getByRole("button", { name: `Guardar ${tipo}` }).click();
       await alta.getByRole("status").filter({ hasText: "Operación confirmada" }).waitFor();
       const row = page.getByRole("row").filter({ hasText: concepto });
       await row.waitFor();
       assert.ok((await row.innerText()).includes("$25.50"));
-      await row.getByText("Corregir", { exact: true }).click();
-      const editar = row.locator("details").first().locator("form");
-      await editar.getByLabel(/Monto USD/).fill("20.25");
-      await editar.getByRole("button", { name: "Guardar", exact: true }).click();
-      await editar.getByRole("status").filter({ hasText: "Operación confirmada" }).waitFor();
-      assert.ok((await row.innerText()).includes("$20.25"));
       await row.getByText("Anular", { exact: true }).click();
-      const anular = row.locator("details").nth(1).locator("form");
+      const anular = row.locator("details").first().locator("form");
       await anular.getByLabel(/Motivo de anulación/).fill("Cierre de prueba E2E con datos simulados");
       await anular.getByRole("button", { name: "Confirmar anulación" }).click();
-      await row.getByText("anulado", { exact: true }).waitFor();
-      console.log(`PASS: ${rol} ${tipo} create, edit, void through browser`);
+      await row.getByText("Anulado", { exact: true }).waitFor();
+      await page.getByLabel("Estado").selectOption("anulado");
+      await page.getByRole("button", { name: "Aplicar filtros" }).click();
+      await page.waitForURL("**estado=anulado**");
+      await page.getByRole("row").filter({ hasText: concepto }).waitFor();
+      console.log(`PASS: ${rol} ${tipo} create, void and status filter through browser`);
     }
     await page.goto(`${base}/usuarios`);
     if (rol === "administrador") {
@@ -68,15 +66,12 @@ try {
       await alta.getByLabel("Estado", { exact: true }).selectOption("true");
       await alta.getByRole("button", { name: "Crear cuenta", exact: true }).click();
       await alta.getByRole("status").filter({ hasText: "Operación confirmada" }).waitFor();
-      const usuario = page.getByRole("article").filter({ hasText: nombre });
-      await usuario.getByText("Editar rol, nombre y acceso", { exact: true }).click();
-      const editar = usuario.locator("form");
-      await editar.getByLabel("Estado", { exact: true }).selectOption("false");
-      await editar.getByRole("button", { name: "Guardar", exact: true }).click();
-      await editar.getByRole("status").filter({ hasText: "Operación confirmada" }).waitFor();
+      const usuario = page.getByRole("row").filter({ hasText: nombre });
+      await usuario.getByRole("switch", { name: `Desactivar ${nombre}` }).click();
+      await usuario.getByRole("switch", { name: `Activar ${nombre}` }).waitFor();
       assert.ok((await usuario.innerText()).includes("Inactivo"));
       await page.goto(`${base}/categorias`);
-      await page.locator("summary").filter({ hasText: "Crear categoría" }).click();
+      await page.locator("summary").filter({ hasText: "Nueva categoría" }).click();
       const categoriaForm = page.locator("details").first().locator("form");
       const categoriaNombre = `E2E SIMULADO categoría ${Date.now()}`;
       let codigo;
@@ -87,17 +82,26 @@ try {
       await categoriaForm.getByRole("button", { name: "Crear categoría", exact: true }).click();
       await categoriaForm.getByRole("status").filter({ hasText: "Operación confirmada" }).waitFor();
       const categoria = page.getByRole("article").filter({ hasText: categoriaNombre });
-      await categoria.getByText("Editar o desactivar", { exact: true }).click();
-      await categoria.getByLabel("Estado", { exact: true }).selectOption("false");
-      await categoria.getByRole("button", { name: "Guardar", exact: true }).click();
-      await categoria.getByRole("status").filter({ hasText: "Operación confirmada" }).waitFor();
+      await categoria.getByRole("switch", { name: `Desactivar ${categoriaNombre}` }).click();
+      await categoria.getByRole("switch", { name: `Activar ${categoriaNombre}` }).waitFor();
       assert.ok((await categoria.innerText()).includes("Inactiva"));
+      await page.goto(`${base}/categorias?tipo=ingreso&estado=inactiva`);
+      await page.getByRole("article").filter({ hasText: categoriaNombre }).waitFor();
       await page.goto(`${base}/auditoria`);
       await page.getByRole("heading", { name: "Seguridad y bitácora", exact: true }).waitFor();
       assert.ok(await page.getByRole("table").count());
       console.log("PASS: administrator creates/deactivates users and categories; audit readable");
     }
-    else assert.ok((await page.getByRole("alert").allTextContents()).some((s) => s.includes("permiso")));
+    else {
+      assert.ok((await page.getByRole("alert").allTextContents()).some((s) => s.includes("permiso")));
+      await page.goto(`${base}/categorias?tipo=ingreso`);
+      let categorias = await page.getByRole("article").allTextContents();
+      assert.ok(categorias.length > 0 && categorias.every((texto) => texto.includes("Ingreso") && !texto.includes("Inactiva")));
+      await page.goto(`${base}/categorias?tipo=gasto`);
+      categorias = await page.getByRole("article").allTextContents();
+      assert.ok(categorias.length > 0 && categorias.every((texto) => texto.includes("Gasto") && !texto.includes("Inactiva")));
+      console.log("PASS: empleado consulta categorías activas filtradas por tipo");
+    }
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`${base}/dashboard`);
     await page.getByRole("heading", { name: "Panel financiero", exact: true }).waitFor();

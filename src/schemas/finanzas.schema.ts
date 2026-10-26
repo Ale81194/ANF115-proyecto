@@ -11,6 +11,7 @@ export const filtroFinancieroSchema = z.object({
   hasta: fechaFinancieraSchema,
   categoria: z.uuid().optional(),
   tipo: z.enum(["ingreso", "gasto"]).optional(),
+  estado: z.enum(["vigente", "anulado"]).optional(),
   granularidad: z.enum(["dia", "mes", "anio"]).default("mes"),
 }).refine((v) => v.desde <= v.hasta, { message: "La fecha inicial no puede ser posterior a la final.", path: ["hasta"] })
   .refine((v) => (Date.parse(v.hasta) - Date.parse(v.desde)) / 86400000 <= 3660,
