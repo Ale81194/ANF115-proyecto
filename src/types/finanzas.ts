@@ -73,6 +73,10 @@ export type EventoBitacora = {
   despues: unknown;
 };
 
+export type EventoBitacoraVista = EventoBitacora & {
+  actor_nombre: string | null;
+};
+
 export type EstadoOperacion = {
   ok: boolean;
   mensaje: string;

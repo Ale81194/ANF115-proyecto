@@ -58,6 +58,10 @@ el acceso; el menú de tres puntos permite editar nombre/rol, consultar los
 detalles de identidad y revisar la actividad disponible en bitácora. No existe
 «Eliminar usuario»: el perfil se conserva para mantener la trazabilidad.
 
+En Seguridad y bitácora, la columna Actor muestra el nombre registrado de la
+persona. Los eventos sin actor humano se identifican como «Sistema»; el UUID se
+mantiene únicamente como referencia técnica interna.
+
 Si falla la asignación después de crear la identidad, el mensaje indica que
 quedó pendiente: buscarla en Usuarios y completar su activación, sin repetir el
 alta. El sistema impide desactivar o degradar al último administrador activo.

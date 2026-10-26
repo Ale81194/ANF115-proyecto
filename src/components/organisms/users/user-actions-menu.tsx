@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/atoms/dialog";
 import { OperationForm } from "@/components/organisms/operation-form";
-import type { AccionOperacion, CampoOperacion, EventoBitacora, PerfilAdministrado } from "@/types/finanzas";
+import type { AccionOperacion, CampoOperacion, EventoBitacoraVista, PerfilAdministrado } from "@/types/finanzas";
 
 type Vista = "editar" | "detalles" | "actividad" | null;
 
@@ -24,7 +24,7 @@ function fecha(valor: string): string {
 
 export function UserActionsMenu({ usuario, eventos, accion }: {
   usuario: PerfilAdministrado;
-  eventos: EventoBitacora[];
+  eventos: EventoBitacoraVista[];
   accion: AccionOperacion;
 }) {
   const [menuAbierto, setMenuAbierto] = useState(false);

@@ -89,7 +89,18 @@ export async function leerBitacora(pagina: number) {
   const { data, error, count } = await c.from("bitacora")
     .select("id,actor_id,fecha_hora,accion,entidad,registro_id,motivo,antes,despues", { count: "exact" })
     .order("fecha_hora", { ascending: false }).order("id").range((pagina - 1) * 50, pagina * 50 - 1);
-  comprobarError(error); return { eventos: data ?? [], total: count ?? 0 };
+  comprobarError(error);
+  const eventos = data ?? [];
+  const ids = [...new Set(eventos.flatMap((evento) => evento.actor_id ? [evento.actor_id] : []))];
+  const { data: actores, error: actoresError } = ids.length > 0
+    ? await c.from("perfiles").select("usuario_id,nombre").in("usuario_id", ids)
+    : { data: [], error: null };
+  comprobarError(actoresError);
+  const nombres = new Map((actores ?? []).map((actor) => [actor.usuario_id, actor.nombre]));
+  return { eventos: eventos.map((evento) => ({
+    ...evento,
+    actor_nombre: evento.actor_id ? (nombres.get(evento.actor_id) ?? "Usuario no disponible") : null,
+  })), total: count ?? 0 };
 }
 
 export async function leerActividadUsuarios(ids: string[]) {
@@ -99,7 +110,14 @@ export async function leerActividadUsuarios(ids: string[]) {
     .select("id,actor_id,fecha_hora,accion,entidad,registro_id,motivo,antes,despues")
     .in("actor_id", ids).order("fecha_hora", { ascending: false }).limit(200);
   comprobarError(error);
-  return data ?? [];
+  const { data: actores, error: actoresError } = await c.from("perfiles")
+    .select("usuario_id,nombre").in("usuario_id", ids);
+  comprobarError(actoresError);
+  const nombres = new Map((actores ?? []).map((actor) => [actor.usuario_id, actor.nombre]));
+  return (data ?? []).map((evento) => ({
+    ...evento,
+    actor_nombre: evento.actor_id ? (nombres.get(evento.actor_id) ?? "Usuario no disponible") : null,
+  }));
 }
 
 type Funciones = FinanzasDatabase["public"]["Functions"];

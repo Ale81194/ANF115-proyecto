@@ -4,7 +4,7 @@ import { CategoryStatusSwitch } from "@/components/molecules/category-status-swi
 import { UserStatusSwitch } from "@/components/molecules/user-status-switch";
 import { UserActionsMenu } from "@/components/organisms/users/user-actions-menu";
 import { OperationForm } from "./operation-form";
-import type { AccionOperacion, Categoria, Perfil, PerfilAdministrado, EventoBitacora, CampoOperacion } from "@/types/finanzas";
+import type { AccionOperacion, Categoria, Perfil, PerfilAdministrado, EventoBitacoraVista, CampoOperacion } from "@/types/finanzas";
 
 function fechaCorta(valor: string): string {
   return new Intl.DateTimeFormat("es-SV", {
@@ -37,7 +37,7 @@ function camposUsuario(p?: Perfil): CampoOperacion[] {
 
 export function AdministrationWorkspace({ modulo, perfil, categorias, perfiles, eventos, accion, tipoCategoria, estadoCategoria, filtrosUsuarios }: {
   modulo: "usuarios" | "categorias" | "bitacora"; perfil: Perfil; categorias: Categoria[];
-  perfiles: PerfilAdministrado[]; eventos: EventoBitacora[]; accion: AccionOperacion;
+  perfiles: PerfilAdministrado[]; eventos: EventoBitacoraVista[]; accion: AccionOperacion;
   tipoCategoria?: "ingreso" | "gasto";
   estadoCategoria?: "activa" | "inactiva";
   filtrosUsuarios?: { buscar?: string; rol?: "administrador" | "empleado"; activo?: boolean };
@@ -52,7 +52,7 @@ export function AdministrationWorkspace({ modulo, perfil, categorias, perfiles, 
       <section className="rounded-card border border-borde bg-superficie p-5"><h2 className="font-serif text-xl">Controles de acceso</h2>
         <p className="mt-2 text-sm">Las cuentas inactivas no operan. El empleado accede solo a sus movimientos; el administrador gestiona usuarios y categorías. Las contraseñas y los eventos de sesión se administran en Auth, no en esta bitácora.</p></section>
       <div className="overflow-x-auto rounded-card border border-borde bg-superficie p-5"><table className="w-full text-sm"><thead><tr className="border-b border-borde text-left">{["Fecha y hora", "Acción", "Entidad", "Actor", "Detalle"].map((t) => <th key={t} className="p-3">{t}</th>)}</tr></thead>
-        <tbody>{eventos.map((e) => <tr key={e.id} className="border-b border-borde align-top"><td className="p-3 whitespace-nowrap">{e.fecha_hora}</td><td className="p-3">{e.accion}</td><td className="p-3">{e.entidad}</td><td className="p-3 font-mono text-xs">{e.actor_id ?? "Sistema"}</td><td className="p-3"><details><summary className="cursor-pointer text-primario">Ver cambio</summary><p>{e.motivo}</p><h3 className="mt-2 font-semibold">Antes</h3><pre className="max-w-lg overflow-auto text-xs">{JSON.stringify(e.antes, null, 2)}</pre><h3 className="mt-2 font-semibold">Después</h3><pre className="max-w-lg overflow-auto text-xs">{JSON.stringify(e.despues, null, 2)}</pre></details></td></tr>)}</tbody>
+        <tbody>{eventos.map((e) => <tr key={e.id} className="border-b border-borde align-top"><td className="p-3 whitespace-nowrap">{e.fecha_hora}</td><td className="p-3">{e.accion}</td><td className="p-3">{e.entidad}</td><td className="p-3 font-medium">{e.actor_nombre ?? "Sistema"}</td><td className="p-3"><details><summary className="cursor-pointer text-primario">Ver cambio</summary><p>{e.motivo}</p><h3 className="mt-2 font-semibold">Antes</h3><pre className="max-w-lg overflow-auto text-xs">{JSON.stringify(e.antes, null, 2)}</pre><h3 className="mt-2 font-semibold">Después</h3><pre className="max-w-lg overflow-auto text-xs">{JSON.stringify(e.despues, null, 2)}</pre></details></td></tr>)}</tbody>
       </table>{eventos.length === 0 && <p className="p-5 text-sm">No hay eventos en esta página.</p>}</div>
     </> : <>
       {admin && modulo === "usuarios" && <details className="group">
@@ -151,7 +151,7 @@ export function AdministrationWorkspace({ modulo, perfil, categorias, perfiles, 
           </tr></thead>
           <tbody>{perfiles.map((usuario) => <tr key={usuario.usuario_id} className="border-b border-borde/70 last:border-0 hover:bg-crema-100/50">
             <td className="px-5 py-3"><div className="flex items-center gap-3"><span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primario/10 text-primario"><UserRound aria-hidden="true" className="size-4" /></span>
-              <div><p className="font-semibold">{usuario.nombre}</p><p className="mt-0.5 max-w-44 truncate font-mono text-[10px] text-texto-suave" title={usuario.usuario_id}>ID: {usuario.usuario_id}</p></div></div></td>
+              <p className="font-semibold">{usuario.nombre}</p></div></td>
             <td className="px-5 py-3 text-texto-suave">{usuario.correo}</td>
             <td className="px-5 py-3"><Badge variant={usuario.rol === "administrador" ? "danger" : "primary"}>{usuario.rol === "administrador" ? "Administrador" : "Empleado"}</Badge></td>
             <td className="px-5 py-3"><UserStatusSwitch usuario={usuario} accion={accion} /></td>
