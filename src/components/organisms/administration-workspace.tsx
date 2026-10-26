@@ -1,8 +1,18 @@
-import { BookOpen, CircleDollarSign, Filter, Pencil, Plus, ReceiptText, Tags } from "lucide-react";
+import { BookOpen, CircleDollarSign, Filter, Pencil, Plus, ReceiptText, Search, Tags, UserRound } from "lucide-react";
 import { Badge } from "@/components/atoms/badge";
 import { CategoryStatusSwitch } from "@/components/molecules/category-status-switch";
+import { UserStatusSwitch } from "@/components/molecules/user-status-switch";
+import { UserActionsMenu } from "@/components/organisms/users/user-actions-menu";
 import { OperationForm } from "./operation-form";
-import type { AccionOperacion, Categoria, Perfil, EventoBitacora, CampoOperacion } from "@/types/finanzas";
+import type { AccionOperacion, Categoria, Perfil, PerfilAdministrado, EventoBitacora, CampoOperacion } from "@/types/finanzas";
+
+function fechaCorta(valor: string): string {
+  return new Intl.DateTimeFormat("es-SV", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "America/El_Salvador",
+  }).format(new Date(valor));
+}
 
 function camposCategoria(c?: Categoria): CampoOperacion[] {
   return [
@@ -25,11 +35,12 @@ function camposUsuario(p?: Perfil): CampoOperacion[] {
   ];
 }
 
-export function AdministrationWorkspace({ modulo, perfil, categorias, perfiles, eventos, accion, tipoCategoria, estadoCategoria }: {
+export function AdministrationWorkspace({ modulo, perfil, categorias, perfiles, eventos, accion, tipoCategoria, estadoCategoria, filtrosUsuarios }: {
   modulo: "usuarios" | "categorias" | "bitacora"; perfil: Perfil; categorias: Categoria[];
-  perfiles: Perfil[]; eventos: EventoBitacora[]; accion: AccionOperacion;
+  perfiles: PerfilAdministrado[]; eventos: EventoBitacora[]; accion: AccionOperacion;
   tipoCategoria?: "ingreso" | "gasto";
   estadoCategoria?: "activa" | "inactiva";
+  filtrosUsuarios?: { buscar?: string; rol?: "administrador" | "empleado"; activo?: boolean };
 }) {
   const admin = perfil.rol === "administrador";
   return <div className="space-y-6">
@@ -44,8 +55,13 @@ export function AdministrationWorkspace({ modulo, perfil, categorias, perfiles, 
         <tbody>{eventos.map((e) => <tr key={e.id} className="border-b border-borde align-top"><td className="p-3 whitespace-nowrap">{e.fecha_hora}</td><td className="p-3">{e.accion}</td><td className="p-3">{e.entidad}</td><td className="p-3 font-mono text-xs">{e.actor_id ?? "Sistema"}</td><td className="p-3"><details><summary className="cursor-pointer text-primario">Ver cambio</summary><p>{e.motivo}</p><h3 className="mt-2 font-semibold">Antes</h3><pre className="max-w-lg overflow-auto text-xs">{JSON.stringify(e.antes, null, 2)}</pre><h3 className="mt-2 font-semibold">Después</h3><pre className="max-w-lg overflow-auto text-xs">{JSON.stringify(e.despues, null, 2)}</pre></details></td></tr>)}</tbody>
       </table>{eventos.length === 0 && <p className="p-5 text-sm">No hay eventos en esta página.</p>}</div>
     </> : <>
-      {admin && modulo === "usuarios" && <details className="rounded-card border border-borde bg-superficie p-5"><summary className="cursor-pointer font-serif text-xl">Registrar usuario</summary>
-        <div className="mt-5"><OperationForm accion={accion} operacion="usuario" campos={camposUsuario()} texto="Crear cuenta" /></div>
+      {admin && modulo === "usuarios" && <details className="group">
+        <summary className="ml-auto flex w-fit cursor-pointer list-none items-center gap-2 rounded-input bg-primario px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primario-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primario [&::-webkit-details-marker]:hidden">
+          <Plus aria-hidden="true" className="size-4" />Registrar usuario
+        </summary>
+        <div className="mt-4 rounded-card border border-borde bg-superficie p-5 shadow-card"><h2 className="mb-4 font-serif text-2xl">Registrar usuario</h2>
+          <OperationForm accion={accion} operacion="usuario" campos={camposUsuario()} texto="Crear cuenta" />
+        </div>
       </details>}
       {admin && modulo === "categorias" && <details className="group">
         <summary className="ml-auto flex w-fit cursor-pointer list-none items-center gap-2 rounded-input bg-primario px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primario-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primario [&::-webkit-details-marker]:hidden">
@@ -56,6 +72,21 @@ export function AdministrationWorkspace({ modulo, perfil, categorias, perfiles, 
           <OperationForm accion={accion} operacion="categoria" ocultos={{ activo: "true" }} campos={camposCategoria()} texto="Crear categoría" />
         </div>
       </details>}
+      {modulo === "usuarios" && <form method="get" className="grid items-end gap-3 rounded-card border border-borde bg-superficie p-5 shadow-card md:grid-cols-[minmax(240px,1fr)_180px_180px_auto]">
+        <label className="text-xs font-semibold">Buscar
+          <span className="relative mt-1 block"><Search aria-hidden="true" className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-texto-suave" />
+            <input name="buscar" defaultValue={filtrosUsuarios?.buscar ?? ""} placeholder="Nombre, correo o identificador" className="h-10 w-full rounded-input border border-borde-fuerte bg-superficie pl-10 pr-3 text-sm" />
+          </span>
+        </label>
+        <label className="text-xs font-semibold">Rol<select name="rol" defaultValue={filtrosUsuarios?.rol ?? ""} className="mt-1 block h-10 w-full rounded-input border border-borde-fuerte bg-superficie px-3 text-sm">
+          <option value="">Todos</option><option value="administrador">Administradores</option><option value="empleado">Empleados</option>
+        </select></label>
+        <label className="text-xs font-semibold">Estado<select name="estado" defaultValue={filtrosUsuarios?.activo === undefined ? "" : filtrosUsuarios.activo ? "activo" : "inactivo"} className="mt-1 block h-10 w-full rounded-input border border-borde-fuerte bg-superficie px-3 text-sm">
+          <option value="">Todos</option><option value="activo">Activos</option><option value="inactivo">Inactivos</option>
+        </select></label>
+        <div className="flex gap-2"><button className="h-10 rounded-input bg-cafe-900 px-4 text-sm font-semibold text-crema-50">Filtrar</button>
+          <a href="/usuarios" className="flex h-10 items-center rounded-input border border-borde px-3 text-sm text-texto-suave hover:bg-superficie-tenue">Limpiar</a></div>
+      </form>}
       {modulo === "categorias" && <>
         <section className="grid gap-4 rounded-card border border-borde bg-superficie p-5 shadow-card lg:grid-cols-[1fr_auto] lg:items-end">
           <div className="flex gap-3">
@@ -82,8 +113,8 @@ export function AdministrationWorkspace({ modulo, perfil, categorias, perfiles, 
           <span className="text-sm text-texto-suave">{categorias.length} {categorias.length === 1 ? "categoría" : "categorías"}</span>
         </div>
       </>}
-      <section className={modulo === "categorias" ? "grid gap-4 md:grid-cols-2 xl:grid-cols-3" : "space-y-3"}>
-        {modulo === "categorias" ? categorias.map((c) => <article key={c.id} className={`rounded-card border bg-superficie p-5 shadow-card ${c.tipo === "ingreso" ? "border-exito/25" : "border-peligro/25"}`}>
+      {modulo === "categorias" ? <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {categorias.map((c) => <article key={c.id} className={`rounded-card border bg-superficie p-5 shadow-card ${c.tipo === "ingreso" ? "border-exito/25" : "border-peligro/25"}`}>
           <div className="flex items-start justify-between gap-3">
             <span className={`flex size-10 shrink-0 items-center justify-center rounded-full ${c.tipo === "ingreso" ? "bg-exito/10 text-exito" : "bg-peligro/10 text-peligro"}`}>
               {c.tipo === "ingreso" ? <CircleDollarSign aria-hidden="true" className="size-5" /> : <ReceiptText aria-hidden="true" className="size-5" />}
@@ -109,12 +140,27 @@ export function AdministrationWorkspace({ modulo, perfil, categorias, perfiles, 
             </details>
             <div className="absolute right-0 top-3"><CategoryStatusSwitch categoria={c} accion={accion} /></div>
           </div>}
-        </article>) : perfiles.map((p) => <article key={p.usuario_id} className="rounded-card border border-borde bg-superficie p-5"><strong>{p.nombre}</strong>
-          <p className="mt-1 text-xs text-texto-suave">{p.rol} · {p.activo ? "Activo" : "Inactivo"}</p><p className="mt-1 break-all font-mono text-xs">{p.usuario_id}</p>
-          <details className="mt-3"><summary className="cursor-pointer text-sm text-primario">Editar rol, nombre y acceso</summary><div className="mt-4"><OperationForm accion={accion} operacion="usuario" ocultos={{ id: p.usuario_id, versionEsperada: p.actualizado_en }} campos={camposUsuario(p)} /></div></details>
         </article>)}
-        {(modulo === "usuarios" ? perfiles : categorias).length === 0 && <p className="rounded-card border border-borde bg-superficie p-8">No hay registros disponibles.</p>}
-      </section>
+        {categorias.length === 0 && <p className="rounded-card border border-borde bg-superficie p-8">No hay categorías disponibles.</p>}
+      </section> : <div className="overflow-x-auto rounded-card border border-borde bg-superficie shadow-card">
+        <table className="w-full min-w-[960px] text-sm">
+          <thead className="border-b border-borde bg-superficie-tenue text-left text-xs text-texto-suave"><tr>
+            <th className="px-5 py-3 font-semibold">Usuario</th><th className="px-5 py-3 font-semibold">Correo electrónico</th>
+            <th className="px-5 py-3 font-semibold">Rol</th><th className="px-5 py-3 font-semibold">Estado</th>
+            <th className="px-5 py-3 font-semibold">Fecha de creación</th><th className="px-5 py-3 text-right font-semibold">Acciones</th>
+          </tr></thead>
+          <tbody>{perfiles.map((usuario) => <tr key={usuario.usuario_id} className="border-b border-borde/70 last:border-0 hover:bg-crema-100/50">
+            <td className="px-5 py-3"><div className="flex items-center gap-3"><span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primario/10 text-primario"><UserRound aria-hidden="true" className="size-4" /></span>
+              <div><p className="font-semibold">{usuario.nombre}</p><p className="mt-0.5 max-w-44 truncate font-mono text-[10px] text-texto-suave" title={usuario.usuario_id}>ID: {usuario.usuario_id}</p></div></div></td>
+            <td className="px-5 py-3 text-texto-suave">{usuario.correo}</td>
+            <td className="px-5 py-3"><Badge variant={usuario.rol === "administrador" ? "danger" : "primary"}>{usuario.rol === "administrador" ? "Administrador" : "Empleado"}</Badge></td>
+            <td className="px-5 py-3"><UserStatusSwitch usuario={usuario} accion={accion} /></td>
+            <td className="whitespace-nowrap px-5 py-3 text-texto-suave">{fechaCorta(usuario.creado_en)}</td>
+            <td className="px-5 py-3"><UserActionsMenu usuario={usuario} eventos={eventos.filter((evento) => evento.actor_id === usuario.usuario_id)} accion={accion} /></td>
+          </tr>)}</tbody>
+        </table>
+        {perfiles.length === 0 && <p className="p-8 text-center text-sm text-texto-suave">No hay usuarios que coincidan con los filtros.</p>}
+      </div>}
     </>}
   </div>;
 }

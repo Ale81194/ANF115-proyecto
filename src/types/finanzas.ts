@@ -9,6 +9,11 @@ export type Perfil = {
   actualizado_en: string;
 };
 
+export type PerfilAdministrado = Perfil & {
+  correo: string;
+  creado_en: string;
+};
+
 export type Categoria = {
   id: string;
   codigo: string;

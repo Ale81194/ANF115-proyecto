@@ -36,6 +36,9 @@ Exportar PDF/XLSX es complementario, no criterio del núcleo.
   administrador añade filtro de estado (`activa` o `inactiva`) y cambia ese
   estado con el interruptor auditado de cada tarjeta. La edición separada exige
   al menos un campo modificado antes de habilitar «Guardar».
+- Usuarios presenta filtros URL, estado mediante interruptor y un menú único de
+  acciones para editar nombre/rol, consultar identidad y revisar actividad. No
+  expone eliminación: la desactivación preserva referencias y bitácora.
 - Toda modificación de movimiento incluye revisión esperada; creación incluye
   solicitud UUID estable y comprueba que el contenido del reintento coincida.
 - Servidor por solicitud, autorización en controlador y PostgreSQL/RLS.

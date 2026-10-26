@@ -1,7 +1,7 @@
 import "server-only";
 import { z } from "zod";
 import { requerirPerfilOperativo } from "@/auth/perfil-operativo";
-import { leerCategorias, leerMovimientos, leerReporte, leerPerfiles, leerBitacora,
+import { leerCategorias, leerMovimientos, leerReporte, leerPerfiles, leerBitacora, leerActividadUsuarios,
   persistirMovimiento, persistirAnulacion, persistirCategoria, persistirUsuario } from "@/repositorios/finanzas.repository";
 import { filtroFinancieroSchema, movimientoSchema, anulacionSchema, categoriaSchema, usuarioSchema } from "@/schemas/finanzas.schema";
 import { anchoComparativo } from "@/servicios/finanzas/resumen";
@@ -41,6 +41,7 @@ export async function consultarAdministracion(
   pagina = 1,
   tipoCategoria?: TipoMovimiento,
   estadoCategoria?: "activa" | "inactiva",
+  filtrosUsuarios?: { buscar?: string; rol?: "administrador" | "empleado"; activo?: boolean },
 ) {
   const requestId = generarRequestId();
   try {
@@ -54,11 +55,16 @@ export async function consultarAdministracion(
       modulo === "categorias"
         ? leerCategorias(tipoCategoria, activoCategoria)
         : Promise.resolve([]),
-      modulo === "usuarios" ? leerPerfiles(pagina) : Promise.resolve({ perfiles: [], total: 0 }),
+      modulo === "usuarios" ? leerPerfiles(pagina, filtrosUsuarios) : Promise.resolve({ perfiles: [], total: 0 }),
       modulo === "bitacora" ? leerBitacora(pagina) : Promise.resolve({ eventos: [], total: 0 }),
     ]);
+    const actividadUsuarios = modulo === "usuarios"
+      ? await leerActividadUsuarios(usuarios.perfiles.map((usuario) => usuario.usuario_id))
+      : [];
     return ok({ perfil, correoPerfil: modulo === "perfil" ? (user.email ?? "") : undefined,
-      categorias, perfiles: usuarios.perfiles, eventos: bitacora.eventos, tipoCategoria, estadoCategoria,
+      categorias, perfiles: usuarios.perfiles,
+      eventos: modulo === "usuarios" ? actividadUsuarios : bitacora.eventos,
+      tipoCategoria, estadoCategoria, filtrosUsuarios,
       total: modulo === "usuarios" ? usuarios.total : bitacora.total }, requestId);
   } catch (e) { return desdeError(e, requestId); }
 }

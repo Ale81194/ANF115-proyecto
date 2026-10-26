@@ -66,12 +66,9 @@ try {
       await alta.getByLabel("Estado", { exact: true }).selectOption("true");
       await alta.getByRole("button", { name: "Crear cuenta", exact: true }).click();
       await alta.getByRole("status").filter({ hasText: "Operación confirmada" }).waitFor();
-      const usuario = page.getByRole("article").filter({ hasText: nombre });
-      await usuario.getByText("Editar rol, nombre y acceso", { exact: true }).click();
-      const editar = usuario.locator("form");
-      await editar.getByLabel("Estado", { exact: true }).selectOption("false");
-      await editar.getByRole("button", { name: "Guardar", exact: true }).click();
-      await editar.getByRole("status").filter({ hasText: "Operación confirmada" }).waitFor();
+      const usuario = page.getByRole("row").filter({ hasText: nombre });
+      await usuario.getByRole("switch", { name: `Desactivar ${nombre}` }).click();
+      await usuario.getByRole("switch", { name: `Activar ${nombre}` }).waitFor();
       assert.ok((await usuario.innerText()).includes("Inactivo"));
       await page.goto(`${base}/categorias`);
       await page.locator("summary").filter({ hasText: "Nueva categoría" }).click();

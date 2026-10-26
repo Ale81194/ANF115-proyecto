@@ -53,6 +53,11 @@ estado. Las cuentas se crean mediante Supabase Auth desde el servidor, nunca
 con claves administrativas en el navegador. Por defecto quedan como empleados
 inactivos hasta completar la asignación autorizada.
 
+La tabla separa responsabilidades: el interruptor de Estado activa o desactiva
+el acceso; el menú de tres puntos permite editar nombre/rol, consultar los
+detalles de identidad y revisar la actividad disponible en bitácora. No existe
+«Eliminar usuario»: el perfil se conserva para mantener la trazabilidad.
+
 Si falla la asignación después de crear la identidad, el mensaje indica que
 quedó pendiente: buscarla en Usuarios y completar su activación, sin repetir el
 alta. El sistema impide desactivar o degradar al último administrador activo.

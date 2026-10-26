@@ -61,11 +61,27 @@ export async function leerReporte(f: FiltroFinanciero) {
   return validado.data;
 }
 
-export async function leerPerfiles(pagina: number) {
+export async function leerPerfiles(pagina: number, filtros?: {
+  buscar?: string;
+  rol?: "administrador" | "empleado";
+  activo?: boolean;
+}) {
   const c = await crearClienteFinanzas();
-  const { data, error, count } = await c.from("perfiles").select("usuario_id,nombre,rol,activo,actualizado_en", { count: "exact" })
-    .order("nombre").order("usuario_id").range((pagina - 1) * 50, pagina * 50 - 1);
-  comprobarError(error); return { perfiles: data ?? [], total: count ?? 0 };
+  const { data, error } = await c.from("perfiles").select("usuario_id,nombre,rol,activo,actualizado_en")
+    .order("nombre").order("usuario_id");
+  comprobarError(error);
+  const { data: identidades, error: authError } = await crearClienteAdmin().auth.admin.listUsers({ page: 1, perPage: 1000 });
+  if (authError) throw new ErrorDominio("INTEGRACION_NO_DISPONIBLE", "No se pudieron consultar las identidades de usuarios.");
+  const porId = new Map(identidades.users.map((usuario) => [usuario.id, usuario]));
+  const buscar = filtros?.buscar?.toLocaleLowerCase("es") ?? "";
+  const perfiles = (data ?? []).map((perfil) => {
+    const identidad = porId.get(perfil.usuario_id);
+    return { ...perfil, correo: identidad?.email ?? "Correo no disponible", creado_en: identidad?.created_at ?? perfil.actualizado_en };
+  }).filter((perfil) =>
+    (!filtros?.rol || perfil.rol === filtros.rol)
+    && (filtros?.activo === undefined || perfil.activo === filtros.activo)
+    && (!buscar || `${perfil.nombre} ${perfil.correo} ${perfil.usuario_id}`.toLocaleLowerCase("es").includes(buscar)));
+  return { perfiles: perfiles.slice((pagina - 1) * 50, pagina * 50), total: perfiles.length };
 }
 
 export async function leerBitacora(pagina: number) {
@@ -74,6 +90,16 @@ export async function leerBitacora(pagina: number) {
     .select("id,actor_id,fecha_hora,accion,entidad,registro_id,motivo,antes,despues", { count: "exact" })
     .order("fecha_hora", { ascending: false }).order("id").range((pagina - 1) * 50, pagina * 50 - 1);
   comprobarError(error); return { eventos: data ?? [], total: count ?? 0 };
+}
+
+export async function leerActividadUsuarios(ids: string[]) {
+  if (ids.length === 0) return [];
+  const c = await crearClienteFinanzas();
+  const { data, error } = await c.from("bitacora")
+    .select("id,actor_id,fecha_hora,accion,entidad,registro_id,motivo,antes,despues")
+    .in("actor_id", ids).order("fecha_hora", { ascending: false }).limit(200);
+  comprobarError(error);
+  return data ?? [];
 }
 
 type Funciones = FinanzasDatabase["public"]["Functions"];
