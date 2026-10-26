@@ -74,7 +74,7 @@ try {
       await editar.getByRole("status").filter({ hasText: "Operación confirmada" }).waitFor();
       assert.ok((await usuario.innerText()).includes("Inactivo"));
       await page.goto(`${base}/categorias`);
-      await page.locator("summary").filter({ hasText: "Crear categoría" }).click();
+      await page.locator("summary").filter({ hasText: "Nueva categoría" }).click();
       const categoriaForm = page.locator("details").first().locator("form");
       const categoriaNombre = `E2E SIMULADO categoría ${Date.now()}`;
       let codigo;
@@ -85,17 +85,26 @@ try {
       await categoriaForm.getByRole("button", { name: "Crear categoría", exact: true }).click();
       await categoriaForm.getByRole("status").filter({ hasText: "Operación confirmada" }).waitFor();
       const categoria = page.getByRole("article").filter({ hasText: categoriaNombre });
-      await categoria.getByText("Editar o desactivar", { exact: true }).click();
-      await categoria.getByLabel("Estado", { exact: true }).selectOption("false");
-      await categoria.getByRole("button", { name: "Guardar", exact: true }).click();
-      await categoria.getByRole("status").filter({ hasText: "Operación confirmada" }).waitFor();
+      await categoria.getByRole("switch", { name: `Desactivar ${categoriaNombre}` }).click();
+      await categoria.getByRole("switch", { name: `Activar ${categoriaNombre}` }).waitFor();
       assert.ok((await categoria.innerText()).includes("Inactiva"));
+      await page.goto(`${base}/categorias?tipo=ingreso&estado=inactiva`);
+      await page.getByRole("article").filter({ hasText: categoriaNombre }).waitFor();
       await page.goto(`${base}/auditoria`);
       await page.getByRole("heading", { name: "Seguridad y bitácora", exact: true }).waitFor();
       assert.ok(await page.getByRole("table").count());
       console.log("PASS: administrator creates/deactivates users and categories; audit readable");
     }
-    else assert.ok((await page.getByRole("alert").allTextContents()).some((s) => s.includes("permiso")));
+    else {
+      assert.ok((await page.getByRole("alert").allTextContents()).some((s) => s.includes("permiso")));
+      await page.goto(`${base}/categorias?tipo=ingreso`);
+      let categorias = await page.getByRole("article").allTextContents();
+      assert.ok(categorias.length > 0 && categorias.every((texto) => texto.includes("Ingreso") && !texto.includes("Inactiva")));
+      await page.goto(`${base}/categorias?tipo=gasto`);
+      categorias = await page.getByRole("article").allTextContents();
+      assert.ok(categorias.length > 0 && categorias.every((texto) => texto.includes("Gasto") && !texto.includes("Inactiva")));
+      console.log("PASS: empleado consulta categorías activas filtradas por tipo");
+    }
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`${base}/dashboard`);
     await page.getByRole("heading", { name: "Panel financiero", exact: true }).waitFor();

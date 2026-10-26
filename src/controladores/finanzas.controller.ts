@@ -9,6 +9,7 @@ import { Decimal } from "@/lib/decimal";
 import { desdeError, generarRequestId, ok, fallo } from "@/lib/resultado";
 import { ErrorDominio } from "@/lib/errores";
 import { hoyEnElSalvador } from "@/lib/fechas";
+import type { TipoMovimiento } from "@/types/finanzas";
 
 type Query = Record<string, string | string[] | undefined>;
 function texto(q: Query, k: string) { return typeof q[k] === "string" ? q[k] : undefined; }
@@ -35,16 +36,28 @@ export async function consultarFinanzas(q: Query, tipo?: "ingreso" | "gasto") {
   }
 }
 
-export async function consultarAdministracion(modulo: "usuarios" | "categorias" | "bitacora" | "perfil", pagina = 1) {
+export async function consultarAdministracion(
+  modulo: "usuarios" | "categorias" | "bitacora" | "perfil",
+  pagina = 1,
+  tipoCategoria?: TipoMovimiento,
+  estadoCategoria?: "activa" | "inactiva",
+) {
   const requestId = generarRequestId();
   try {
     const { perfil } = await requerirPerfilOperativo(modulo === "usuarios" || modulo === "bitacora");
+    const activoCategoria = modulo === "categorias"
+      ? (perfil.rol === "administrador"
+          ? (estadoCategoria ? estadoCategoria === "activa" : undefined)
+          : true)
+      : undefined;
     const [categorias, usuarios, bitacora] = await Promise.all([
-      modulo === "categorias" ? leerCategorias() : Promise.resolve([]),
+      modulo === "categorias"
+        ? leerCategorias(tipoCategoria, activoCategoria)
+        : Promise.resolve([]),
       modulo === "usuarios" ? leerPerfiles(pagina) : Promise.resolve({ perfiles: [], total: 0 }),
       modulo === "bitacora" ? leerBitacora(pagina) : Promise.resolve({ eventos: [], total: 0 }),
     ]);
-    return ok({ perfil, categorias, perfiles: usuarios.perfiles, eventos: bitacora.eventos,
+    return ok({ perfil, categorias, perfiles: usuarios.perfiles, eventos: bitacora.eventos, tipoCategoria, estadoCategoria,
       total: modulo === "usuarios" ? usuarios.total : bitacora.total }, requestId);
   } catch (e) { return desdeError(e, requestId); }
 }

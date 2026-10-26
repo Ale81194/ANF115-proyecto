@@ -25,11 +25,7 @@ limita los envíos; esperar antes de repetir una solicitud.
 La misma solicitud de alta se conserva al reintentar; no se crean duplicados.
 Una categoría inactiva no puede clasificarse en una nueva captura.
 
-## Corregir o anular
-
-En un movimiento vigente, abrir «Corregir», cambiar los campos y guardar. Si
-otra persona modificó el registro, recargar antes de volver a editar: no se
-sobrescribe una revisión distinta silenciosamente.
+## Anular
 
 «Anular» exige un motivo de 5–500 caracteres y confirmación. Es definitivo: el
 registro se conserva, deja de formar parte de los indicadores y no admite otra
@@ -41,8 +37,14 @@ movimientos autorizados del negocio.
 
 El administrador puede crear, editar y desactivar categorías. El código comienza
 por I (ingreso) o G (gasto). Una categoría utilizada no puede cambiar código o
-tipo; desactivarla conserva el historial. El empleado solo consulta las activas
-y las necesarias para interpretar sus registros históricos.
+tipo; desactivarla conserva el historial. En este módulo el empleado solo
+consulta categorías activas. El filtro «Mostrar» permite consultar todas, solo
+ingresos o solo gastos. Cada tarjeta explica qué
+cobro o pago corresponde a la categoría; se trata del catálogo operativo de 26
+categorías, no del catálogo contable histórico de 47 cuentas. El administrador
+también puede filtrar activas o inactivas. El interruptor de cada tarjeta activa
+o desactiva la categoría mediante una operación auditada. La edición se abre con
+el icono de lápiz y no permite guardar si ningún campo cambió.
 
 ## Usuarios
 

@@ -13,22 +13,26 @@ function IconoCampo({ nombre }: { nombre: string }) {
   return null;
 }
 
-export function OperationForm({ accion, operacion, campos, ocultos = {}, texto = "Guardar", solicitud, presentacion = "estandar" }: {
+export function OperationForm({ accion, operacion, campos, ocultos = {}, texto = "Guardar", solicitud, presentacion = "estandar", requiereCambios = false, unaColumna = false }: {
   accion: AccionOperacion; operacion: string; campos: CampoOperacion[];
   ocultos?: Record<string, string>; texto?: string; solicitud?: string;
   presentacion?: "estandar" | "movimiento";
+  requiereCambios?: boolean;
+  unaColumna?: boolean;
 }) {
   const [estado, action, pendiente] = useActionState(accion, { ok: false, mensaje: "" });
-  const [valores, setValores] = useState<Record<string, string>>(() => Object.fromEntries(campos.map((c) => [c.nombre, c.valor ?? ""])));
+  const [iniciales] = useState<Record<string, string>>(() => Object.fromEntries(campos.map((c) => [c.nombre, c.valor ?? ""])));
+  const [valores, setValores] = useState<Record<string, string>>(() => ({ ...iniciales }));
   const [solicitudId, setSolicitudId] = useState(solicitud);
   const uid = useId();
   const financiero = presentacion === "movimiento";
+  const hayCambios = campos.some((campo) => valores[campo.nombre] !== iniciales[campo.nombre]);
   const clase = `w-full rounded-input border border-borde-fuerte bg-superficie px-3 text-sm text-texto placeholder:text-texto-suave/60 focus-visible:border-primario focus-visible:outline-2 focus-visible:outline-primario/25 ${financiero ? "h-12 py-3" : "py-2.5"}`;
   return <form action={action} className={financiero ? "space-y-6" : "space-y-4"}>
     <input type="hidden" name="operacion" value={operacion} />
     {solicitudId && <input type="hidden" name="solicitud_id" value={solicitudId} />}
     {Object.entries(ocultos).map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />)}
-    <div className={`grid sm:grid-cols-2 ${financiero ? "gap-x-8 gap-y-5" : "gap-4"}`}>
+    <div className={`grid ${unaColumna ? "grid-cols-1" : "sm:grid-cols-2"} ${financiero ? "gap-x-8 gap-y-5" : "gap-4"}`}>
       {campos.map((c) => {
         const id = `${uid}-${c.nombre}`;
         const error = estado.campos?.[c.nombre];
@@ -39,7 +43,7 @@ export function OperationForm({ accion, operacion, campos, ocultos = {}, texto =
             setValores((v) => ({ ...v, [c.nombre]: e.target.value }));
             if (estado.ok && solicitud) setSolicitudId(crypto.randomUUID());
           }, className: clase };
-        return <div key={c.nombre} className={c.tipo === "textarea" ? "sm:col-span-2" : ""}>
+        return <div key={c.nombre} className={c.tipo === "textarea" && !unaColumna ? "sm:col-span-2" : ""}>
           <label htmlFor={id} className={`mb-2 text-sm font-semibold ${financiero ? "flex items-center gap-2" : "block"}`}>
             {financiero && <IconoCampo nombre={c.nombre} />}
             <span>{c.etiqueta}{financiero && c.requerido && <span aria-hidden="true" className="ml-1 text-peligro">*</span>}</span>
@@ -58,11 +62,11 @@ export function OperationForm({ accion, operacion, campos, ocultos = {}, texto =
     </div>
     <p role="status" aria-live="polite" className={estado.ok ? "text-sm text-exito" : "text-sm text-peligro"}>{estado.mensaje}</p>
     <div className={financiero ? "flex flex-wrap items-center gap-4 border-t border-borde pt-5" : ""}>
-      <button disabled={pendiente || (estado.ok && !solicitud)} className={`inline-flex items-center justify-center gap-2 rounded-input bg-primario font-semibold text-white shadow-sm hover:bg-primario-hover disabled:opacity-50 ${financiero ? "h-12 px-7" : "px-5 py-2.5 text-sm"}`}>
+      <button disabled={pendiente || (requiereCambios && !hayCambios) || (estado.ok && !solicitud)} className={`inline-flex items-center justify-center gap-2 rounded-input bg-primario font-semibold text-white shadow-sm hover:bg-primario-hover disabled:cursor-not-allowed disabled:opacity-50 ${financiero ? "h-12 px-7" : "px-5 py-2.5 text-sm"}`}>
         {financiero && <Save aria-hidden="true" className="size-4" />}
         {pendiente ? "Guardando…" : texto}
       </button>
-      {estado.ok && <a href="" className="inline-block text-sm text-primario underline">Continuar con una nueva operación</a>}
+      {estado.ok && solicitud && <a href="" className="inline-block text-sm text-primario underline">Continuar con una nueva operación</a>}
     </div>
   </form>;
 }

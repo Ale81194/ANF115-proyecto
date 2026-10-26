@@ -5,7 +5,7 @@ import { crearClienteAdmin } from "@/supabase/admin";
 import type { FinanzasDatabase } from "@/supabase/finanzas.types";
 import { ErrorDominio } from "@/lib/errores";
 import { aImporteCanonico } from "@/lib/decimal";
-import type { FiltroFinanciero } from "@/types/finanzas";
+import type { FiltroFinanciero, TipoMovimiento } from "@/types/finanzas";
 
 const decimal = z.string().regex(/^-?\d+(?:\.\d{1,2})?$/).transform(aImporteCanonico);
 const resumen = z.object({ ingresos: decimal, gastos: decimal, resultado: decimal,
@@ -26,9 +26,12 @@ export function comprobarError(error: { code?: string; message?: string } | null
   throw new ErrorDominio("INTEGRACION_NO_DISPONIBLE");
 }
 
-export async function leerCategorias() {
+export async function leerCategorias(tipo?: TipoMovimiento, activo?: boolean) {
   const c = await crearClienteFinanzas();
-  const { data, error } = await c.from("categorias").select("id,codigo,nombre,tipo,descripcion,activo,actualizado_en").order("codigo");
+  let consulta = c.from("categorias").select("id,codigo,nombre,tipo,descripcion,activo,actualizado_en");
+  if (tipo) consulta = consulta.eq("tipo", tipo);
+  if (activo !== undefined) consulta = consulta.eq("activo", activo);
+  const { data, error } = await consulta.order("codigo");
   comprobarError(error);
   return data ?? [];
 }

@@ -30,6 +30,12 @@ Exportar PDF/XLSX es complementario, no criterio del núcleo.
 - El detalle admite filtro URL por estado (`vigente` o `anulado`). Este filtro
   afecta únicamente el listado paginado; los indicadores continúan calculándose
   con movimientos vigentes sobre las fechas, categoría y tipo seleccionados.
+- Categorías admite filtro URL por tipo (`ingreso` o `gasto`). El empleado
+  consulta las categorías activas autorizadas con la explicación de uso del
+  catálogo operativo documentado; no se presentan como cuentas contables. El
+  administrador añade filtro de estado (`activa` o `inactiva`) y cambia ese
+  estado con el interruptor auditado de cada tarjeta. La edición separada exige
+  al menos un campo modificado antes de habilitar «Guardar».
 - Toda modificación de movimiento incluye revisión esperada; creación incluye
   solicitud UUID estable y comprueba que el contenido del reintento coincida.
 - Servidor por solicitud, autorización en controlador y PostgreSQL/RLS.
